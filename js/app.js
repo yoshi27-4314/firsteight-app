@@ -1783,13 +1783,42 @@ function setTheme(theme) {
     document.body.removeAttribute('data-theme');
   }
   localStorage.setItem('f8_theme', theme);
-  document.getElementById('themeMale').classList.toggle('active', theme === 'male');
-  document.getElementById('themeFemale').classList.toggle('active', theme === 'female');
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = theme === 'female' ? '🌸' : '🔵';
+}
+
+function toggleTheme() {
+  const current = localStorage.getItem('f8_theme') || 'male';
+  setTheme(current === 'male' ? 'female' : 'male');
 }
 
 function loadTheme() {
   const saved = localStorage.getItem('f8_theme') || 'male';
   setTheme(saved);
+}
+
+// ====== アバターメニュー ======
+function openAvatarMenu() {
+  document.getElementById('avatarMenu').style.display = 'block';
+}
+
+function closeAvatarMenu() {
+  document.getElementById('avatarMenu').style.display = 'none';
+}
+
+function editAvatarImage() {
+  closeAvatarMenu();
+  const saved = localStorage.getItem('f8_avatar');
+  if (!saved) { showToast('写真が設定されていません'); return; }
+  openCropModal(saved, 'avatar');
+}
+
+function deleteAvatarImage() {
+  closeAvatarMenu();
+  localStorage.removeItem('f8_avatar');
+  document.getElementById('avatarImg').style.display = 'none';
+  document.getElementById('avatarEmoji').style.display = 'block';
+  showToast('写真を削除しました');
 }
 
 // ====== プロフィール画像 ======
