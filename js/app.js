@@ -983,6 +983,14 @@ function filterByStatus(status) {
 
 // ====== 出退勤 ======
 function submitAttendance() {
+  // 1日1回チェック
+  const today = new Date().toISOString().slice(0, 10);
+  const saved = localStorage.getItem('f8_attendance_' + today);
+  if (saved) {
+    showToast('本日は既に登録済みです。修正は浅野さんに連絡してください。');
+    return;
+  }
+
   const start = document.getElementById('attendStart').value;
   const end = document.getElementById('attendEnd').value;
 
@@ -993,7 +1001,7 @@ function submitAttendance() {
   const [sh, sm] = start.split(':').map(Number);
   const [eh, em] = end.split(':').map(Number);
   const totalMin = (eh * 60 + em) - (sh * 60 + sm);
-  const breakMin = 60; // 標準休憩60分（将来はスタッフマスターから取得）
+  const breakMin = 60;
   const netMin = totalMin - breakMin;
   const netHours = (netMin / 60).toFixed(1);
 
@@ -1009,8 +1017,8 @@ function submitAttendance() {
     timestamp: formatTimestamp(),
   });
 
-  // ローカルに記録
-  localStorage.setItem('f8_attendance_' + new Date().toISOString().slice(0, 10), JSON.stringify({
+  // ローカルに記録（1日1回制限用）
+  localStorage.setItem('f8_attendance_' + today, JSON.stringify({
     start, end, breakMin, netHours, staffName: currentUser.name,
   }));
 
@@ -1018,6 +1026,10 @@ function submitAttendance() {
   const msg = document.getElementById('attendanceMsg');
   msg.textContent = `✅ ${start}〜${end}（実働${netHours}時間）記録済み`;
   msg.classList.add('recorded');
+
+  // 入力欄を無効化
+  document.getElementById('attendStart').disabled = true;
+  document.getElementById('attendEnd').disabled = true;
 
   showToast('🕐 勤務記録を送信しました');
 }
@@ -1034,9 +1046,43 @@ function checkTodayAttendance() {
         msg.classList.add('recorded');
         document.getElementById('attendStart').value = a.start;
         document.getElementById('attendEnd').value = a.end;
+        document.getElementById('attendStart').disabled = true;
+        document.getElementById('attendEnd').disabled = true;
+        // 送信ボタンを修正依頼ボタンに差し替え
+        const submitBtn = document.querySelector('[onclick="submitAttendance()"]');
+        if (submitBtn) {
+          submitBtn.textContent = '📝 修正を依頼する（浅野さんに連絡）';
+          submitBtn.onclick = requestAttendanceCorrection;
+          submitBtn.className = 'btn btn-outline';
+        }
       }
     } catch {}
   }
+}
+
+function openAttendanceConsult() {
+  const msg = prompt('勤怠についての連絡・相談内容を入力してください：');
+  if (!msg) return;
+
+  sendToGAS({
+    action: 'chat_message',
+    from: currentUser.name,
+    to: '浅野儀頼',
+    message: `【勤怠連絡】${msg}`,
+    timestamp: formatTimestamp(),
+  });
+  showToast('💬 浅野さんに送信しました');
+}
+
+function requestAttendanceCorrection() {
+  sendToGAS({
+    action: 'chat_message',
+    from: currentUser.name,
+    to: '浅野儀頼',
+    message: `出退勤の修正を依頼します。本日の記録を確認してください。`,
+    timestamp: formatTimestamp(),
+  });
+  showToast('📝 浅野さんに修正依頼を送信しました');
 }
 
 // ====== 在庫検索 ======
