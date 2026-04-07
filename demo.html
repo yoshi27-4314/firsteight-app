@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>カラーデモ - 3事業</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #e8e4de;
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 24px; padding: 24px;
+}
+h1 {
+  width: 100%; text-align: center; font-size: 20px; color: #333;
+  margin-bottom: 8px;
+}
+.phone {
+  width: 375px; height: 750px;
+  border-radius: 40px; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2), 0 0 0 2px #222;
+  position: relative; flex-shrink: 0;
+}
+.phone-label {
+  text-align: center; font-size: 14px; font-weight: 700; color: #555;
+  margin-top: 8px;
+}
+.phone-inner {
+  width: 100%; height: 100%; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+/* ============ TAKEBACK ============ */
+.tb { background: #F8F5EE; }
+.tb .hdr {
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 2px solid #C5A258; background: #F8F5EE; position: sticky; top: 0; z-index: 10;
+}
+.tb .hdr-logo {
+  width: 32px; height: 32px; border-radius: 8px; background: #1C2541; color: #C5A258;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+}
+.tb .hdr-title { font-size: 15px; font-weight: 700; color: #1C2541; margin-left: 8px; }
+.tb .hdr-left { display: flex; align-items: center; }
+.tb .hdr-right { display: flex; gap: 8px; font-size: 18px; }
+.tb .notif-dot { position: relative; }
+.tb .notif-dot::after {
+  content: '3'; position: absolute; top: -6px; right: -8px;
+  background: #CE2029; color: #fff; font-size: 9px; font-weight: 700;
+  width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.tb .body { padding: 16px; }
+.tb .greeting { font-size: 18px; font-weight: 700; color: #1C2541; }
+.tb .date { font-size: 12px; color: #7a7a7a; margin-top: 2px; margin-bottom: 16px; }
+.tb .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.tb .stat {
+  background: #fff; border-radius: 12px; padding: 14px; text-align: center;
+  box-shadow: 0 2px 8px rgba(28,37,65,0.06);
+  border-left: 3px solid #C5A258;
+}
+.tb .stat-num { font-size: 26px; font-weight: 700; color: #C5A258; }
+.tb .stat-label { font-size: 12px; color: #5a6272; margin-top: 2px; }
+.tb .section-title { font-size: 14px; font-weight: 700; color: #1C2541; margin-bottom: 10px; }
+
+/* 商品カード with image */
+.tb .product-card {
+  background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(28,37,65,0.06); margin-bottom: 12px;
+}
+.tb .product-img {
+  width: 100%; height: 160px; object-fit: cover;
+  background: linear-gradient(135deg, #d4c5a9 0%, #e8dcc8 50%, #c9b896 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #8a7a5a; font-size: 40px; position: relative;
+}
+.tb .product-img .channel-tag {
+  position: absolute; top: 10px; left: 10px;
+  background: #006B3F; color: #fff; padding: 3px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 700;
+}
+.tb .product-img .price-tag {
+  position: absolute; bottom: 10px; right: 10px;
+  background: rgba(28,37,65,0.85); color: #C5A258; padding: 4px 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 700;
+}
+.tb .product-info { padding: 12px 14px; }
+.tb .product-number { font-size: 12px; font-weight: 700; color: #C5A258; font-family: monospace; }
+.tb .product-name { font-size: 14px; font-weight: 500; color: #1C2541; margin-top: 2px; }
+.tb .product-meta { font-size: 11px; color: #7a7a7a; margin-top: 4px; }
+.tb .product-status {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; margin-top: 6px;
+}
+.tb .status-green { background: #e6f4ec; color: #006B3F; }
+.tb .status-red { background: #fde8e8; color: #CE2029; }
+.tb .status-gold { background: #faf3e0; color: #8a6d20; }
+
+/* 撮影ボタン */
+.tb .camera-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, #006B3F, #008a50); color: #fff;
+  font-size: 16px; font-weight: 700; margin-top: 16px;
+  box-shadow: 0 4px 16px rgba(0,107,63,0.25);
+}
+
+/* お知らせ */
+.tb .notice {
+  background: #fff; border-radius: 10px; padding: 10px 14px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px; font-size: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.tb .notice-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; white-space: nowrap;
+}
+.tb .badge-red { background: #fde8e8; color: #CE2029; }
+.tb .badge-green { background: #e6f4ec; color: #006B3F; }
+.tb .badge-gold { background: #faf3e0; color: #8a6d20; }
+
+/* ボトムナビ */
+.tb .bnav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; background: #fff; border-top: 1px solid #dde0e6;
+  padding: 8px 0 16px;
+}
+.tb .bnav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  font-size: 10px; color: #7a7a7a; gap: 2px;
+}
+.tb .bnav-item.active { color: #006B3F; }
+.tb .bnav-icon { font-size: 20px; }
+.tb .bnav-cam {
+  background: #C5A258; color: #fff; width: 42px; height: 42px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-top: -12px; box-shadow: 0 2px 8px rgba(197,162,88,0.3);
+}
+
+/* ============ CLEARMAINTE ============ */
+.cm { background: #F8F5EE; }
+.cm .hdr {
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 3px solid #FDD100; background: #F8F5EE; position: sticky; top: 0; z-index: 10;
+}
+.cm .hdr-logo {
+  width: 32px; height: 32px; border-radius: 8px; background: #2C2C2C; color: #FDD100;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+}
+.cm .hdr-title { font-size: 15px; font-weight: 700; color: #2C2C2C; margin-left: 8px; }
+.cm .hdr-left { display: flex; align-items: center; }
+.cm .hdr-right { font-size: 18px; }
+.cm .body { padding: 16px; }
+.cm .greeting { font-size: 18px; font-weight: 700; color: #2C2C2C; }
+.cm .date { font-size: 12px; color: #7a7a7a; margin-top: 2px; margin-bottom: 16px; }
+.cm .section-title { font-size: 14px; font-weight: 700; color: #2C2C2C; margin-bottom: 10px; }
+
+/* 案件カード */
+.cm .job-card {
+  background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(44,44,44,0.06); margin-bottom: 12px;
+  border-left: 4px solid #FDD100;
+}
+.cm .job-img {
+  width: 100%; height: 120px;
+  background: linear-gradient(135deg, #e8e2d0 0%, #d6cdb8 50%, #ccc4b0 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #8a8068; font-size: 36px; position: relative;
+}
+.cm .job-img .job-tag {
+  position: absolute; top: 8px; left: 8px;
+  background: #FDD100; color: #2C2C2C; padding: 3px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 700;
+}
+.cm .job-info { padding: 12px 14px; }
+.cm .job-title { font-size: 14px; font-weight: 700; color: #2C2C2C; }
+.cm .job-meta { font-size: 12px; color: #7a7a7a; margin-top: 4px; }
+.cm .job-amount { font-size: 16px; font-weight: 700; color: #2C2C2C; margin-top: 6px; }
+.cm .job-amount span { color: #FDD100; }
+.cm .job-status {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; margin-top: 6px;
+}
+.cm .status-progress { background: #fef6e0; color: #8a7020; }
+.cm .status-done { background: #e6f4ec; color: #2d7a3e; }
+
+.cm .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.cm .stat {
+  background: #fff; border-radius: 10px; padding: 12px; text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.cm .stat-num { font-size: 22px; font-weight: 700; color: #2C2C2C; }
+.cm .stat-label { font-size: 10px; color: #7a7a7a; margin-top: 2px; }
+
+.cm .bnav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; background: #fff; border-top: 1px solid #e0dcd6;
+  padding: 8px 0 16px;
+}
+.cm .bnav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  font-size: 10px; color: #7a7a7a; gap: 2px;
+}
+.cm .bnav-item.active { color: #2C2C2C; font-weight: 700; }
+.cm .bnav-icon { font-size: 20px; }
+
+/* ============ AIX ============ */
+.aix { background: #F8F5EE; }
+.aix .hdr {
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  background: #F8F5EE; position: sticky; top: 0; z-index: 10;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, #E87CA0, #6BB8D6, #B0B8C4, #8CC63F) 1;
+}
+.aix .hdr-logo {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, #E87CA0, #6BB8D6); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+}
+.aix .hdr-title { font-size: 15px; font-weight: 700; color: #3a3a3a; margin-left: 8px; }
+.aix .hdr-left { display: flex; align-items: center; }
+.aix .hdr-right { font-size: 18px; }
+.aix .body { padding: 16px; }
+.aix .greeting { font-size: 18px; font-weight: 700; color: #3a3a3a; }
+.aix .sub { font-size: 12px; color: #888; margin-top: 2px; margin-bottom: 16px; }
+.aix .section-title { font-size: 14px; font-weight: 700; color: #3a3a3a; margin-bottom: 10px; }
+
+/* サービスカード */
+.aix .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.aix .service-card {
+  border-radius: 14px; padding: 20px 14px; text-align: center;
+  color: #fff; font-weight: 700; font-size: 13px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.aix .service-icon { font-size: 28px; margin-bottom: 8px; }
+.aix .s-pink { background: linear-gradient(135deg, #E87CA0, #f4a0b8); }
+.aix .s-blue { background: linear-gradient(135deg, #6BB8D6, #8dcce6); }
+.aix .s-silver { background: linear-gradient(135deg, #9aa0aa, #B0B8C4); }
+.aix .s-green { background: linear-gradient(135deg, #7ab534, #8CC63F); }
+
+/* 提案書カード */
+.aix .proposal-card {
+  background: #fff; border-radius: 12px; padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.aix .proposal-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.aix .pi-pink { background: #fce8ef; }
+.aix .pi-blue { background: #e4f2f8; }
+.aix .pi-green { background: #edf6e4; }
+.aix .proposal-title { font-size: 13px; font-weight: 700; color: #3a3a3a; }
+.aix .proposal-meta { font-size: 11px; color: #888; margin-top: 2px; }
+.aix .proposal-status {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+  margin-top: 4px; display: inline-block;
+}
+.aix .ps-progress { background: #e4f2f8; color: #4a8aa8; }
+.aix .ps-review { background: #fce8ef; color: #c4607a; }
+
+.aix .bnav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; background: #fff; border-top: 1px solid #e0dcd6;
+  padding: 8px 0 16px;
+}
+.aix .bnav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  font-size: 10px; color: #7a7a7a; gap: 2px;
+}
+.aix .bnav-item.active { color: #E87CA0; font-weight: 700; }
+.aix .bnav-icon { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<h1>ファーストエイトグループ カラーデモ（3事業）</h1>
+
+<!-- ========== テイクバック ========== -->
+<div>
+<div class="phone">
+<div class="phone-inner tb">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo">F8</div>
+      <span class="hdr-title">テイクバック</span>
+    </div>
+    <div class="hdr-right">
+      <span class="notif-dot">🔔</span>
+      <span>⚙️</span>
+    </div>
+  </div>
+  <div class="body" style="padding-bottom:80px;">
+    <div class="greeting">おはようございます、桃井さん</div>
+    <div class="date">2026年4月8日（火）</div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-num">12</div><div class="stat-label">分荷判定</div></div>
+      <div class="stat"><div class="stat-num">28</div><div class="stat-label">撮影</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">出品</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">梱包</div></div>
+    </div>
+
+    <div class="section-title">📋 お知らせ</div>
+    <div class="notice">
+      <span class="notice-badge badge-red">承認待ち</span>
+      <span>高額品 2604-0031 ¥45,000 浅野さん確認中</span>
+    </div>
+    <div class="notice">
+      <span class="notice-badge badge-green">承認済</span>
+      <span>2604-0029 ヤフオクビンテージで出品OK</span>
+    </div>
+    <div class="notice">
+      <span class="notice-badge badge-gold">落札</span>
+      <span>2604-0022 ¥18,500で落札されました</span>
+    </div>
+
+    <div style="margin-top:20px">
+      <div class="section-title">📦 最近の商品</div>
+      <div class="product-card">
+        <div class="product-img">
+          🏺
+          <span class="channel-tag">ヤフオクビンテージ</span>
+          <span class="price-tag">¥18,000</span>
+        </div>
+        <div class="product-info">
+          <div class="product-number">2604-0031</div>
+          <div class="product-name">アンティーク 真鍮テーブルランプ</div>
+          <div class="product-meta">分荷: 桃井侑菜 ・ 保管: A-2</div>
+          <span class="product-status status-red">承認待ち</span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          📻
+          <span class="channel-tag">ヤフオク現行</span>
+          <span class="price-tag">¥4,500</span>
+        </div>
+        <div class="product-info">
+          <div class="product-number">2604-0030</div>
+          <div class="product-name">SONY トランジスタラジオ ICF-506</div>
+          <div class="product-meta">分荷: 横山優 ・ 保管: B-1</div>
+          <span class="product-status status-green">出品中</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="camera-btn">📷 撮影を開始する</button>
+  </div>
+  <div class="bnav">
+    <div class="bnav-item active"><span class="bnav-icon">🏠</span>ホーム</div>
+    <div class="bnav-item"><span class="bnav-icon">📦</span>在庫</div>
+    <div class="bnav-item"><span class="bnav-cam">📷</span>撮影</div>
+    <div class="bnav-item"><span class="bnav-icon">💬</span>チャット</div>
+    <div class="bnav-item"><span class="bnav-icon">👤</span>マイページ</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">テイクバック（流通事業）</div>
+</div>
+
+<!-- ========== クリアメンテ ========== -->
+<div>
+<div class="phone">
+<div class="phone-inner cm">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo">CM</div>
+      <span class="hdr-title">クリアメンテ</span>
+    </div>
+    <div class="hdr-right">🔔 ⚙️</div>
+  </div>
+  <div class="body" style="padding-bottom:80px;">
+    <div class="greeting">おはようございます、浅野さん</div>
+    <div class="date">2026年4月8日（火）</div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">見積中</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">施工中</div></div>
+      <div class="stat"><div class="stat-num">2</div><div class="stat-label">請求待ち</div></div>
+    </div>
+
+    <div class="section-title">🔨 進行中の案件</div>
+    <div class="job-card">
+      <div class="job-img">
+        🏠
+        <span class="job-tag">施工中</span>
+      </div>
+      <div class="job-info">
+        <div class="job-title">岐阜市蔵前 片付け作業</div>
+        <div class="job-meta">担当: 浅野 ・ 2026/04/10 完工予定</div>
+        <div class="job-amount"><span>¥</span>185,000</div>
+        <span class="job-status status-progress">施工中</span>
+      </div>
+    </div>
+    <div class="job-card">
+      <div class="job-img">
+        🌳
+        <span class="job-tag">見積提出</span>
+      </div>
+      <div class="job-info">
+        <div class="job-title">岐阜市出屋敷 剪定作業</div>
+        <div class="job-meta">担当: 浅野 ・ 見積提出済み</div>
+        <div class="job-amount"><span>¥</span>120,000</div>
+        <span class="job-status status-done">返答待ち</span>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="bnav-item active"><span class="bnav-icon">🏠</span>ホーム</div>
+    <div class="bnav-item"><span class="bnav-icon">📋</span>案件</div>
+    <div class="bnav-item"><span class="bnav-icon">📸</span>現場</div>
+    <div class="bnav-item"><span class="bnav-icon">💰</span>請求</div>
+    <div class="bnav-item"><span class="bnav-icon">👤</span>設定</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">クリアメンテ（工事事業）</div>
+</div>
+
+<!-- ========== AIX ========== -->
+<div>
+<div class="phone">
+<div class="phone-inner aix">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo">AIX</div>
+      <span class="hdr-title">AIX事業部</span>
+    </div>
+    <div class="hdr-right">🔔</div>
+  </div>
+  <div class="body" style="padding-bottom:80px;">
+    <div class="greeting">浅野さん、おはようございます</div>
+    <div class="sub">伴走型AIトランスフォーメーション事業部</div>
+
+    <div class="section-title">🚀 サービスメニュー</div>
+    <div class="service-grid">
+      <div class="service-card s-pink">
+        <div class="service-icon">🎨</div>
+        UI/UXデザイン
+      </div>
+      <div class="service-card s-blue">
+        <div class="service-icon">🤖</div>
+        AI導入支援
+      </div>
+      <div class="service-card s-silver">
+        <div class="service-icon">📊</div>
+        業務分析
+      </div>
+      <div class="service-card s-green">
+        <div class="service-icon">💻</div>
+        アプリ開発
+      </div>
+    </div>
+
+    <div class="section-title">📑 進行中のプロジェクト</div>
+    <div class="proposal-card">
+      <div class="proposal-icon pi-pink">🏢</div>
+      <div>
+        <div class="proposal-title">OKABE GROUP タイヤホテル</div>
+        <div class="proposal-meta">岡部グループ ・ 管理システム構築</div>
+        <span class="proposal-status ps-progress">開発中</span>
+      </div>
+    </div>
+    <div class="proposal-card">
+      <div class="proposal-icon pi-blue">🎁</div>
+      <div>
+        <div class="proposal-title">AWAI ギフトコンシェルジュ</div>
+        <div class="proposal-meta">自社サービス ・ PWA + AI</div>
+        <span class="proposal-status ps-progress">開発中</span>
+      </div>
+    </div>
+    <div class="proposal-card">
+      <div class="proposal-icon pi-green">🌿</div>
+      <div>
+        <div class="proposal-title">ピアリー連携提案</div>
+        <div class="proposal-meta">業務提携 ・ 4/15商談予定</div>
+        <span class="proposal-status ps-review">準備中</span>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="bnav-item active"><span class="bnav-icon">🏠</span>ホーム</div>
+    <div class="bnav-item"><span class="bnav-icon">📁</span>案件</div>
+    <div class="bnav-item"><span class="bnav-icon">💡</span>アイデア</div>
+    <div class="bnav-item"><span class="bnav-icon">💬</span>AI</div>
+    <div class="bnav-item"><span class="bnav-icon">⚙️</span>設定</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">AIX事業部（AI受託）</div>
+</div>
+
+</body>
+</html>
