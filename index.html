@@ -6,7 +6,7 @@
 <title>テイクバック 流通事業部</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C2541">
-<link rel="stylesheet" href="css/style.css?v=20260408g">
+<link rel="stylesheet" href="css/style.css?v=20260408h">
 <script src="https://unpkg.com/@zxing/browser@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -752,6 +752,8 @@
           </div>
           <button class="btn btn-primary" onclick="submitAttendance()">📝 勤務記録を送信</button>
           <button class="btn btn-outline" onclick="openAttendanceConsult()" style="font-size:13px; margin-top:8px">💬 勤怠について連絡・相談する</button>
+          <button class="btn btn-outline" onclick="toggleAttendanceHistory()" style="font-size:13px; margin-top:8px" id="attendHistoryBtn">📅 今月の出勤状況を見る</button>
+          <div id="attendanceHistory" style="display:none"></div>
         </div>
       </div>
 
@@ -788,7 +790,7 @@
 
 </div>
 
-<script src="js/config.js?v=20260408g"></script>
-<script src="js/app.js?v=20260408g"></script>
+<script src="js/config.js?v=20260408h"></script>
+<script src="js/app.js?v=20260408h"></script>
 </body>
 </html>

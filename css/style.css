@@ -487,6 +487,30 @@ body {
 .attendance-msg.recorded { color: var(--accent); font-weight: 700; }
 .attendance-row { display: flex; gap: 12px; margin-bottom: 12px; }
 
+/* ====== ATTENDANCE HISTORY ====== */
+.attend-history-card {
+  background: var(--card); border-radius: 12px; padding: 16px;
+  margin-top: 12px; box-shadow: 0 2px 8px var(--shadow);
+}
+.attend-calendar { display: flex; flex-direction: column; gap: 2px; }
+.attend-day {
+  display: flex; align-items: center; padding: 6px 0;
+  border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.attend-day:last-child { border-bottom: none; }
+.attend-date { width: 80px; color: var(--sub); font-size: 12px; }
+.attend-time { flex: 1; }
+.attend-hours { width: 50px; text-align: right; font-weight: 700; color: var(--gold); }
+.attend-day-worked .attend-time { color: var(--accent); }
+.attend-day-missing .attend-time { color: var(--danger); font-size: 12px; }
+.attend-day-off .attend-time { color: var(--sub); font-size: 12px; }
+.attend-summary {
+  display: flex; justify-content: space-between;
+  margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--gold);
+  font-size: 13px; color: var(--sub);
+}
+.attend-summary strong { color: var(--gold); }
+
 /* ====== BOTTOM NAV ====== */
 .bottom-nav {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);

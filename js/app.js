@@ -1060,6 +1060,81 @@ function checkTodayAttendance() {
   }
 }
 
+function toggleAttendanceHistory() {
+  const el = document.getElementById('attendanceHistory');
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    document.getElementById('attendHistoryBtn').textContent = '📅 出勤状況を閉じる';
+    renderAttendanceHistory();
+  } else {
+    el.style.display = 'none';
+    document.getElementById('attendHistoryBtn').textContent = '📅 今月の出勤状況を見る';
+  }
+}
+
+function renderAttendanceHistory() {
+  const el = document.getElementById('attendanceHistory');
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = ['日','月','火','水','木','金','土'];
+
+  let totalDays = 0;
+  let totalHours = 0;
+  let html = `<div class="attend-history-card">
+    <h4 style="font-size:14px; font-weight:700; margin-bottom:12px;">${year}年${month + 1}月の出勤状況</h4>
+    <div class="attend-calendar">`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const dateStr = date.toISOString().slice(0, 10);
+    const dayName = days[date.getDay()];
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const saved = localStorage.getItem('f8_attendance_' + dateStr);
+
+    let status = '';
+    let hours = '';
+    let rowClass = 'attend-day';
+
+    if (saved) {
+      try {
+        const a = JSON.parse(saved);
+        status = `${a.start}〜${a.end}`;
+        hours = `${a.netHours}h`;
+        totalDays++;
+        totalHours += parseFloat(a.netHours);
+        rowClass += ' attend-day-worked';
+      } catch {}
+    } else if (date <= now) {
+      if (isWeekend) {
+        status = '—';
+        rowClass += ' attend-day-off';
+      } else if (d <= now.getDate()) {
+        status = '未登録';
+        rowClass += ' attend-day-missing';
+      }
+    }
+
+    if (d <= now.getDate() || saved) {
+      html += `<div class="${rowClass}">
+        <span class="attend-date">${d}日（${dayName}）</span>
+        <span class="attend-time">${status}</span>
+        <span class="attend-hours">${hours}</span>
+      </div>`;
+    }
+  }
+
+  html += `</div>
+    <div class="attend-summary">
+      <span>出勤日数: <strong>${totalDays}日</strong></span>
+      <span>合計実働: <strong>${totalHours.toFixed(1)}時間</strong></span>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
 function openAttendanceConsult() {
   const msg = prompt('勤怠についての連絡・相談内容を入力してください：');
   if (!msg) return;
