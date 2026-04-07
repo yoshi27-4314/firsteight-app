@@ -276,6 +276,27 @@ body {
 .camera-icon { font-size: 48px; }
 .photo-preview { width: 100%; height: auto; display: block; }
 
+/* ====== BARCODE ====== */
+.barcode-area {
+  position: relative; border-radius: 16px; overflow: hidden;
+  background: #1a1a1a; margin-bottom: 12px;
+}
+.barcode-video { width: 100%; height: 280px; object-fit: cover; display: block; }
+.barcode-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.barcode-line {
+  width: 80%; height: 2px; background: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+  animation: scanLine 2s ease-in-out infinite;
+}
+@keyframes scanLine {
+  0%, 100% { transform: translateY(-40px); }
+  50% { transform: translateY(40px); }
+}
+
 /* ====== AI RESULT ====== */
 .ai-result { }
 .ai-header {

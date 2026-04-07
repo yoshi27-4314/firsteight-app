@@ -188,20 +188,174 @@ function generateManagementNumber() {
   return prefix + '-' + String(nextSeq).padStart(4, '0');
 }
 
+// ====== 入口選択 ======
+function startPhotoEntry() {
+  document.getElementById('entrySelect').style.display = 'none';
+  document.getElementById('photoMode').style.display = 'block';
+  document.getElementById('barcodeMode').style.display = 'none';
+}
+
+function startBarcodeEntry() {
+  document.getElementById('entrySelect').style.display = 'none';
+  document.getElementById('photoMode').style.display = 'none';
+  document.getElementById('barcodeMode').style.display = 'block';
+  startBarcodeScanner();
+}
+
+// ====== バーコードスキャナー ======
+let barcodeReader = null;
+
+async function startBarcodeScanner() {
+  try {
+    const codeReader = new ZXingBrowser.BrowserMultiFormatReader();
+    barcodeReader = codeReader;
+    const videoEl = document.getElementById('barcodeVideo');
+
+    const devices = await ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
+    // 背面カメラを優先
+    const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.includes('背面')) || devices[0];
+
+    codeReader.decodeFromVideoDevice(backCamera?.deviceId || undefined, videoEl, (result, err) => {
+      if (result) {
+        const isbn = result.getText();
+        console.log('Barcode detected:', isbn);
+        stopBarcode();
+        handleBarcodeResult(isbn);
+      }
+    });
+  } catch (err) {
+    console.error('Barcode scanner error:', err);
+    showToast('カメラを起動できませんでした');
+  }
+}
+
+function stopBarcode() {
+  if (barcodeReader) {
+    barcodeReader.reset?.();
+    barcodeReader = null;
+  }
+  const video = document.getElementById('barcodeVideo');
+  if (video && video.srcObject) {
+    video.srcObject.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
+  document.getElementById('entrySelect').style.display = 'block';
+  document.getElementById('barcodeMode').style.display = 'none';
+  document.getElementById('barcodeResult').style.display = 'none';
+}
+
+function handleBarcodeResult(isbn) {
+  document.getElementById('barcodeISBN').textContent = isbn;
+  document.getElementById('barcodeTitle').textContent = '検索中...';
+  document.getElementById('barcodeResult').style.display = 'block';
+
+  // Amazon URLを生成
+  currentItem.isbn = isbn;
+  currentItem.amazonUrl = `https://www.amazon.co.jp/dp/${isbn}`;
+
+  // ISBNから書籍情報を取得（Google Books API - 無料・キー不要）
+  fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.items && data.items.length > 0) {
+        const book = data.items[0].volumeInfo;
+        currentItem.productName = book.title || 'タイトル不明';
+        currentItem.maker = (book.authors || []).join(', ');
+        currentItem.category = '書籍';
+        currentItem.bookInfo = {
+          title: book.title,
+          authors: book.authors,
+          publisher: book.publisher,
+          publishedDate: book.publishedDate,
+          pageCount: book.pageCount,
+          thumbnail: book.imageLinks?.thumbnail,
+        };
+        document.getElementById('barcodeTitle').textContent = currentItem.productName;
+        if (book.imageLinks?.thumbnail) {
+          currentItem.photo1 = null; // 本はAmazon画像で代替
+        }
+      } else {
+        document.getElementById('barcodeTitle').textContent = 'タイトル不明（ISBN: ' + isbn + '）';
+        currentItem.productName = 'ISBN: ' + isbn;
+        currentItem.category = '書籍';
+      }
+    })
+    .catch(err => {
+      console.error('Book search error:', err);
+      document.getElementById('barcodeTitle').textContent = 'ISBN: ' + isbn;
+    });
+}
+
+async function analyzeBarcode() {
+  showToast('🤖 AIが判定中...');
+
+  try {
+    // バーコードの場合は画像なしでテキスト情報をAIに送る
+    const bookContext = currentItem.bookInfo
+      ? `書籍名: ${currentItem.bookInfo.title}\n著者: ${(currentItem.bookInfo.authors || []).join(', ')}\n出版社: ${currentItem.bookInfo.publisher || '不明'}\nページ数: ${currentItem.bookInfo.pageCount || '不明'}\nISBN: ${currentItem.isbn}\nAmazon URL: ${currentItem.amazonUrl}`
+      : `ISBN: ${currentItem.isbn}\nAmazon URL: ${currentItem.amazonUrl}`;
+
+    const response = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-judge', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': CONFIG.SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({
+        image: null,
+        step: 'book',
+        context: { bookInfo: bookContext },
+      }),
+    });
+
+    const result = await response.json();
+    if (result.success && result.judgment) {
+      const j = result.judgment;
+      currentItem = { ...currentItem, ...j };
+      // 書籍名を保持
+      if (!j.productName && currentItem.bookInfo) {
+        currentItem.productName = currentItem.bookInfo.title;
+      }
+      document.getElementById('aiProductName').textContent = currentItem.productName || '—';
+      document.getElementById('aiCategory').textContent = '書籍';
+      document.getElementById('aiCondition').textContent = `${j.condition || '—'} ${j.conditionNote || ''}`;
+      document.getElementById('aiChannel').textContent = j.channel || '—';
+      document.getElementById('aiPrice').textContent = j.estimatedPrice
+        ? `¥${j.estimatedPrice.min?.toLocaleString()}〜¥${j.estimatedPrice.max?.toLocaleString()}`
+        : '—';
+      document.getElementById('aiSize').textContent = j.estimatedSize || '—';
+      showCameraStep(2);
+    } else {
+      showToast('判定エラー');
+    }
+  } catch (err) {
+    console.error('Book judge error:', err);
+    showToast('通信エラー');
+  }
+}
+
 // ====== 撮影フロー ======
 function resetCameraFlow() {
   cameraStep = 1;
   currentItem = {};
   photosTaken = 0;
   showCameraStep(1);
+  // 入口選択に戻す
+  const entrySelect = document.getElementById('entrySelect');
+  if (entrySelect) entrySelect.style.display = 'block';
+  const photoMode = document.getElementById('photoMode');
+  if (photoMode) photoMode.style.display = 'none';
+  const barcodeMode = document.getElementById('barcodeMode');
+  if (barcodeMode) barcodeMode.style.display = 'none';
+  const barcodeResult = document.getElementById('barcodeResult');
+  if (barcodeResult) barcodeResult.style.display = 'none';
   const preview = document.getElementById('preview1');
-  if (preview) {
-    preview.style.display = 'none';
-  }
+  if (preview) preview.style.display = 'none';
   const afterPhoto = document.getElementById('afterPhoto1');
   if (afterPhoto) afterPhoto.style.display = 'none';
   const placeholder = document.querySelector('.camera-placeholder');
   if (placeholder) placeholder.style.display = 'flex';
+  stopBarcode();
 }
 
 function showCameraStep(step) {

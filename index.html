@@ -6,7 +6,8 @@
 <title>ファーストエイト</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C2541">
-<link rel="stylesheet" href="css/style.css?v=20260407j">
+<link rel="stylesheet" href="css/style.css?v=20260407k">
+<script src="https://unpkg.com/@zxing/browser@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -286,29 +287,76 @@
 
     <!-- 撮影タブ -->
     <div id="tab-camera" class="tab-content">
-      <!-- ステップ1: 写真撮影 -->
+      <!-- ステップ1: 写真撮影 or バーコード -->
       <div id="cameraStep1" class="camera-step active">
-        <div class="camera-guide">
-          <h3>📷 1枚目：全体写真</h3>
-          <p>基準物（テプラ等）を商品の横に置いて撮影してください</p>
-          <div class="guide-illustration">
-            <div class="guide-box">
-              <div class="guide-product">商品</div>
-              <div class="guide-reference">基準物</div>
+        <!-- 入口選択 -->
+        <div class="entry-select" id="entrySelect">
+          <div class="camera-guide">
+            <h3>商品を登録</h3>
+            <p>撮影またはバーコードスキャンで開始します</p>
+          </div>
+          <button class="camera-start-btn" onclick="startPhotoEntry()" style="margin-bottom:12px">
+            <span class="camera-start-icon">📷</span>
+            <span>写真で登録</span>
+          </button>
+          <button class="camera-start-btn" onclick="startBarcodeEntry()" style="background:var(--primary)">
+            <span class="camera-start-icon">📱</span>
+            <span>バーコードで登録（本など）</span>
+          </button>
+        </div>
+
+        <!-- 写真撮影モード -->
+        <div id="photoMode" style="display:none">
+          <div class="camera-guide">
+            <h3>📷 1枚目：全体写真</h3>
+            <p>基準物（テプラ等）を商品の横に置いて撮影してください</p>
+            <div class="guide-illustration">
+              <div class="guide-box">
+                <div class="guide-product">商品</div>
+                <div class="guide-reference">基準物</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="camera-area" id="cameraArea">
-          <div class="camera-placeholder" onclick="takePhoto()">
-            <span class="camera-icon">📷</span>
-            <span>タップして撮影</span>
+          <div class="camera-area" id="cameraArea">
+            <div class="camera-placeholder" onclick="takePhoto()">
+              <span class="camera-icon">📷</span>
+              <span>タップして撮影</span>
+            </div>
+            <img id="preview1" class="photo-preview" style="display:none">
           </div>
-          <img id="preview1" class="photo-preview" style="display:none">
+          <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event, 1)">
+          <div id="afterPhoto1" style="display:none">
+            <button class="btn btn-primary" onclick="analyzePhoto()">🤖 AIに判定させる</button>
+            <button class="btn btn-outline" onclick="retakePhoto(1)">撮り直す</button>
+          </div>
         </div>
-        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event, 1)">
-        <div id="afterPhoto1" style="display:none">
-          <button class="btn btn-primary" onclick="analyzePhoto()">🤖 AIに判定させる</button>
-          <button class="btn btn-outline" onclick="retakePhoto(1)">撮り直す</button>
+
+        <!-- バーコードスキャンモード -->
+        <div id="barcodeMode" style="display:none">
+          <div class="camera-guide">
+            <h3>📱 バーコードをスキャン</h3>
+            <p>本のバーコード（ISBN）にカメラを向けてください</p>
+          </div>
+          <div class="barcode-area">
+            <video id="barcodeVideo" class="barcode-video" playsinline></video>
+            <div class="barcode-overlay">
+              <div class="barcode-line"></div>
+            </div>
+          </div>
+          <div id="barcodeResult" style="display:none">
+            <div class="ai-card" style="margin-top:12px">
+              <div class="ai-row">
+                <span class="ai-label">ISBN</span>
+                <span class="ai-value" id="barcodeISBN">—</span>
+              </div>
+              <div class="ai-row">
+                <span class="ai-label">商品</span>
+                <span class="ai-value" id="barcodeTitle">検索中...</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="analyzeBarcode()" style="margin-top:12px">🤖 AIに判定させる</button>
+          </div>
+          <button class="btn btn-outline" onclick="stopBarcode()" style="margin-top:12px">戻る</button>
         </div>
       </div>
 
@@ -528,7 +576,7 @@
 
 </div>
 
-<script src="js/config.js?v=20260407j"></script>
-<script src="js/app.js?v=20260407j"></script>
+<script src="js/config.js?v=20260407k"></script>
+<script src="js/app.js?v=20260407k"></script>
 </body>
 </html>
