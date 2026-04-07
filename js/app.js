@@ -1329,7 +1329,8 @@ function renderAttendanceHistory() {
   const month = attendHistoryMonth;
   const now = new Date();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const days = ['日','月','火','水','木','金','土'];
+  const firstDow = new Date(year, month, 1).getDay(); // 0=日
+  const dayLabels = ['日','月','火','水','木','金','土'];
   const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
 
   let totalDays = 0;
@@ -1341,49 +1342,60 @@ function renderAttendanceHistory() {
       <h4 class="attend-month-title">${year}年${month + 1}月</h4>
       <button class="attend-nav-btn ${isCurrentMonth ? 'disabled' : ''}" onclick="changeAttendMonth(1)" ${isCurrentMonth ? 'disabled' : ''}>▶</button>
     </div>
-    <div class="attend-calendar">`;
+    <div class="attend-cal-grid">
+      <div class="attend-cal-header">`;
 
+  // 曜日ヘッダー
+  for (let i = 0; i < 7; i++) {
+    const cls = (i === 0) ? 'attend-cal-dow sun' : (i === 6) ? 'attend-cal-dow sat' : 'attend-cal-dow';
+    html += `<div class="${cls}">${dayLabels[i]}</div>`;
+  }
+  html += `</div><div class="attend-cal-body">`;
+
+  // 空セル（月初の曜日まで）
+  for (let i = 0; i < firstDow; i++) {
+    html += `<div class="attend-cal-cell empty"></div>`;
+  }
+
+  // 日付セル
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(year, month, d);
     const dateStr = date.toISOString().slice(0, 10);
-    const dayName = days[date.getDay()];
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const dow = date.getDay();
+    const isWeekend = dow === 0 || dow === 6;
     const isFuture = date > now;
     const saved = localStorage.getItem('f8_attendance_' + dateStr);
 
-    let status = '';
-    let hours = '';
-    let rowClass = 'attend-day';
+    let cellClass = 'attend-cal-cell';
+    let content = `<div class="attend-cal-date">${d}</div>`;
+    let dot = '';
 
     if (saved) {
       try {
         const a = JSON.parse(saved);
-        status = `${a.start}〜${a.end}`;
-        hours = `${a.netHours}h`;
         totalDays++;
         totalHours += parseFloat(a.netHours);
-        rowClass += ' attend-day-worked';
+        dot = `<div class="attend-cal-dot worked"></div><div class="attend-cal-hours">${a.netHours}h</div>`;
+        cellClass += ' worked';
       } catch {}
     } else if (!isFuture) {
       if (isWeekend) {
-        status = '—';
-        rowClass += ' attend-day-off';
+        cellClass += ' off';
       } else {
-        status = '未登録';
-        rowClass += ' attend-day-missing';
+        dot = `<div class="attend-cal-dot missing"></div>`;
+        cellClass += ' missing';
       }
     } else {
-      continue;
+      cellClass += ' future';
     }
 
-    html += `<div class="${rowClass}">
-      <span class="attend-date">${d}日（${dayName}）</span>
-      <span class="attend-time">${status}</span>
-      <span class="attend-hours">${hours}</span>
-    </div>`;
+    if (dow === 0) cellClass += ' sun';
+    if (dow === 6) cellClass += ' sat';
+
+    html += `<div class="${cellClass}">${content}${dot}</div>`;
   }
 
-  html += `</div>
+  html += `</div></div>
     <div class="attend-summary">
       <span>出勤日数: <strong>${totalDays}日</strong></span>
       <span>合計実働: <strong>${totalHours.toFixed(1)}時間</strong></span>
