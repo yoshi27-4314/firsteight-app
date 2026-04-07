@@ -67,6 +67,7 @@ function showMainScreen() {
   updateDate();
   updateHomeStats();
   renderStockList();
+  checkTodayAttendance();
 }
 
 // 自動ログイン
@@ -132,13 +133,30 @@ function updateHomeStats() {
 function renderStockList() {
   const list = document.getElementById('stockList');
   if (!list) return;
-  const items = getItems();
+  let items = getItems();
+
+  updateStatusCounts();
+
   if (items.length === 0) {
-    // デモデータがある場合はそのまま
+    const emptyEl = document.getElementById('stockEmpty');
+    if (emptyEl) emptyEl.style.display = 'block';
+    list.innerHTML = '';
     return;
   }
+  const emptyEl = document.getElementById('stockEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
 
-  // ローカルデータがある場合は表示
+  // フィルター適用
+  if (currentFilter !== 'all') {
+    items = items.filter(i => {
+      if (currentFilter === '登録済') return !i.needsApproval && !i.shipped;
+      if (currentFilter === '承認待ち') return i.needsApproval && !i.shipped;
+      if (currentFilter === '出品中') return i.status === '出品中';
+      if (currentFilter === '出荷済') return i.shipped;
+      return true;
+    });
+  }
+
   let html = '';
   items.slice(0, 20).forEach(item => {
     let statusClass, statusText;
@@ -752,6 +770,94 @@ async function completeShipping() {
   showToast('🚚 ' + selectedItem.mgmtNum + ' 出荷完了');
   closeItemDetail();
   renderStockList();
+}
+
+// ====== ステータスフィルター ======
+let currentFilter = 'all';
+
+function updateStatusCounts() {
+  const items = getItems();
+  const all = items.length;
+  const registered = items.filter(i => !i.needsApproval && !i.shipped).length;
+  const approval = items.filter(i => i.needsApproval && !i.shipped).length;
+  const listed = items.filter(i => i.status === '出品中').length;
+  const shipped = items.filter(i => i.shipped).length;
+
+  const el = (id) => document.getElementById(id);
+  if (el('countAll')) el('countAll').textContent = all;
+  if (el('countRegistered')) el('countRegistered').textContent = registered;
+  if (el('countApproval')) el('countApproval').textContent = approval;
+  if (el('countListed')) el('countListed').textContent = listed;
+  if (el('countShipped')) el('countShipped').textContent = shipped;
+}
+
+function filterByStatus(status) {
+  currentFilter = status;
+  const titleEl = document.getElementById('stockListTitle');
+  if (status === 'all') {
+    titleEl.textContent = '📦 全商品';
+  } else {
+    titleEl.textContent = '📦 ' + status;
+  }
+  renderStockList();
+}
+
+// ====== 出退勤 ======
+function submitAttendance() {
+  const start = document.getElementById('attendStart').value;
+  const end = document.getElementById('attendEnd').value;
+
+  if (!start) { showToast('出勤時刻を入力してください'); return; }
+  if (!end) { showToast('退勤時刻を入力してください'); return; }
+
+  // 実働時間計算
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  const totalMin = (eh * 60 + em) - (sh * 60 + sm);
+  const breakMin = 60; // 標準休憩60分（将来はスタッフマスターから取得）
+  const netMin = totalMin - breakMin;
+  const netHours = (netMin / 60).toFixed(1);
+
+  // GASに送信
+  sendToGAS({
+    action: 'attendance',
+    staff_id: currentUser.name,
+    type: '勤務申告',
+    start_time: start,
+    end_time: end,
+    break_minutes: breakMin,
+    net_hours: netHours,
+    timestamp: formatTimestamp(),
+  });
+
+  // ローカルに記録
+  localStorage.setItem('f8_attendance_' + new Date().toISOString().slice(0, 10), JSON.stringify({
+    start, end, breakMin, netHours, staffName: currentUser.name,
+  }));
+
+  // 表示更新
+  const msg = document.getElementById('attendanceMsg');
+  msg.textContent = `✅ ${start}〜${end}（実働${netHours}時間）記録済み`;
+  msg.classList.add('recorded');
+
+  showToast('🕐 勤務記録を送信しました');
+}
+
+function checkTodayAttendance() {
+  const today = new Date().toISOString().slice(0, 10);
+  const saved = localStorage.getItem('f8_attendance_' + today);
+  if (saved) {
+    try {
+      const a = JSON.parse(saved);
+      const msg = document.getElementById('attendanceMsg');
+      if (msg) {
+        msg.textContent = `✅ ${a.start}〜${a.end}（実働${a.netHours}時間）記録済み`;
+        msg.classList.add('recorded');
+        document.getElementById('attendStart').value = a.start;
+        document.getElementById('attendEnd').value = a.end;
+      }
+    } catch {}
+  }
 }
 
 // ====== 在庫検索 ======
