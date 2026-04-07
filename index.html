@@ -6,7 +6,7 @@
 <title>テイクバック 流通事業部</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C2541">
-<link rel="stylesheet" href="css/style.css?v=20260408k">
+<link rel="stylesheet" href="css/style.css?v=20260408l">
 <script src="https://unpkg.com/@zxing/browser@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -712,28 +712,7 @@
           </div>
         </div>
       </div>
-      <div class="section">
-        <h3 class="section-title">📊 今月の実績</h3>
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-number">156</div>
-            <div class="stat-label">分荷判定</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">203</div>
-            <div class="stat-label">撮影</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">89</div>
-            <div class="stat-label">出品</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">34</div>
-            <div class="stat-label">梱包</div>
-          </div>
-        </div>
-      </div>
-      <!-- 出退勤 -->
+      <!-- 出退勤（朝一番に使う） -->
       <div class="section">
         <h3 class="section-title">🕐 出退勤</h3>
         <div id="attendanceStatus" class="attendance-card">
@@ -756,6 +735,29 @@
           <button class="btn btn-outline" onclick="openAttendanceConsult()" style="font-size:13px; margin-top:8px">💬 勤怠について連絡・相談する</button>
           <button class="btn btn-outline" onclick="toggleAttendanceHistory()" style="font-size:13px; margin-top:8px" id="attendHistoryBtn">📅 今月の出勤状況を見る</button>
           <div id="attendanceHistory" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- 今月の実績 -->
+      <div class="section">
+        <h3 class="section-title">📊 今月の実績</h3>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-number">156</div>
+            <div class="stat-label">分荷判定</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">203</div>
+            <div class="stat-label">撮影</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">89</div>
+            <div class="stat-label">出品</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">34</div>
+            <div class="stat-label">梱包</div>
+          </div>
         </div>
       </div>
 
@@ -816,7 +818,7 @@
 
 </div>
 
-<script src="js/config.js?v=20260408k"></script>
-<script src="js/app.js?v=20260408k"></script>
+<script src="js/config.js?v=20260408l"></script>
+<script src="js/app.js?v=20260408l"></script>
 </body>
 </html>
