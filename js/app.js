@@ -396,6 +396,17 @@ async function completeRegistration(loc) {
   document.getElementById('completeLocation').textContent = loc;
   showCameraStep(5);
 
+  // 出品情報の表示（通販チャンネル=1〜5の場合）
+  const listingSection = document.getElementById('listingSection');
+  if (currentItem.channelNumber && currentItem.channelNumber <= 5) {
+    listingSection.style.display = 'block';
+    document.getElementById('listingTitle').value = currentItem.listingTitle || currentItem.productName || '';
+    document.getElementById('listingDesc').value = currentItem.listingDescription || '';
+    document.getElementById('listingPrice').value = currentItem.startPrice || '';
+  } else {
+    listingSection.style.display = 'none';
+  }
+
   // ローカルに保存
   addItem({
     mgmtNum: mgmtNum,
@@ -464,6 +475,34 @@ async function completeRegistration(loc) {
 function startNewItem() {
   resetCameraFlow();
   switchTab('camera');
+}
+
+// ====== 出品情報コピー ======
+function copyListing() {
+  const title = document.getElementById('listingTitle').value;
+  const desc = document.getElementById('listingDesc').value;
+  const price = document.getElementById('listingPrice').value;
+  const text = `【タイトル】\n${title}\n\n【説明文】\n${desc}\n\n【スタート価格】¥${Number(price).toLocaleString()}`;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('📋 出品情報をコピーしました');
+    }).catch(() => {
+      fallbackCopy(text);
+    });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('📋 出品情報をコピーしました');
 }
 
 // ====== Google Drive連携 ======
