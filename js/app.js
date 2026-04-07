@@ -141,16 +141,18 @@ function renderStockList() {
   // ローカルデータがある場合は表示
   let html = '';
   items.slice(0, 20).forEach(item => {
-    const statusClass = item.needsApproval ? 'status-shooting' : 'status-listing';
-    const statusText = item.needsApproval ? '承認待ち' : '登録済';
+    let statusClass, statusText;
+    if (item.shipped) { statusClass = 'status-listed'; statusText = '出荷済'; }
+    else if (item.needsApproval) { statusClass = 'status-shooting'; statusText = '承認待ち'; }
+    else { statusClass = 'status-listing'; statusText = '登録済'; }
     html += `
-      <div class="stock-card">
+      <div class="stock-card" onclick="openItemDetail('${item.mgmtNum}')" style="cursor:pointer">
         <div class="stock-header">
           <span class="stock-number">${item.mgmtNum || '---'}</span>
           <span class="stock-status ${statusClass}">${statusText}</span>
         </div>
         <div class="stock-name">${escapeHtml(item.productName || '不明')}</div>
-        <div class="stock-meta">分荷: ${escapeHtml(currentUser.name)} ・ ${escapeHtml(item.channel || '---')} ・ ¥${item.estimatedPrice?.min?.toLocaleString() || '---'}</div>
+        <div class="stock-meta">${escapeHtml(item.channel || '---')} ・ ¥${item.estimatedPrice?.min?.toLocaleString() || '---'} ・ ${escapeHtml(item.location || '---')}</div>
       </div>
     `;
   });
@@ -622,6 +624,134 @@ function removeChatMessage(id) {
 
 function startConsultation() {
   addChatMessage('浅野さんへの相談を入力してください。写真付きの場合は撮影タブから商品を登録し、「相談する」ボタンを使ってください。', 'bot');
+}
+
+// ====== 商品詳細・出荷登録 ======
+let selectedItem = null;
+
+function openItemDetail(mgmtNum) {
+  const items = getItems();
+  const item = items.find(i => i.mgmtNum === mgmtNum);
+  if (!item) { showToast('商品が見つかりません'); return; }
+
+  selectedItem = item;
+  document.getElementById('detailMgmtNum').textContent = item.mgmtNum;
+  document.getElementById('detailName').textContent = item.productName || '—';
+  document.getElementById('detailMaker').textContent = item.maker || '—';
+  document.getElementById('detailChannel').textContent = item.channel || '—';
+  document.getElementById('detailPrice').textContent = item.estimatedPrice
+    ? `¥${item.estimatedPrice.min?.toLocaleString()}〜¥${item.estimatedPrice.max?.toLocaleString()}`
+    : '—';
+  document.getElementById('detailCondition').textContent = `${item.condition || '—'} ${item.conditionNote || ''}`;
+  document.getElementById('detailSize').textContent = item.estimatedSize || '—';
+  document.getElementById('detailLocation').textContent = item.location || '—';
+  document.getElementById('detailStatus').textContent = item.status || '登録済';
+
+  // 出荷済みなら出荷セクション非表示
+  const shippingSection = document.getElementById('shippingSection');
+  if (item.shipped) {
+    shippingSection.style.display = 'none';
+  } else {
+    shippingSection.style.display = 'block';
+  }
+
+  document.getElementById('itemDetailOverlay').classList.add('open');
+}
+
+function closeItemDetail() {
+  document.getElementById('itemDetailOverlay').classList.remove('open');
+  selectedItem = null;
+}
+
+function scanTrackingLabel() {
+  document.getElementById('trackingPhotoInput').click();
+}
+
+async function handleTrackingPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showToast('🤖 送り状を読み取り中...');
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    compressImage(e.target.result, 1200, 0.8, async (compressed) => {
+      try {
+        // Edge Function経由でClaude Visionに送り状を読ませる
+        const response = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-judge', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': CONFIG.SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            image: compressed,
+            step: 'tracking',
+            context: { task: '送り状から追跡番号と運送会社を読み取ってください。JSON形式: {"carrier":"運送会社名","trackingNumber":"追跡番号"}' },
+          }),
+        });
+        const result = await response.json();
+        if (result.success && result.judgment) {
+          const j = result.judgment;
+          if (j.trackingNumber) {
+            document.getElementById('shippingTracking').value = j.trackingNumber;
+          }
+          if (j.carrier) {
+            const sel = document.getElementById('shippingCarrier');
+            for (let opt of sel.options) {
+              if (opt.value.includes(j.carrier) || j.carrier.includes(opt.value)) {
+                sel.value = opt.value;
+                break;
+              }
+            }
+          }
+          showToast('✅ 読み取り完了');
+        } else {
+          showToast('読み取れませんでした。手入力してください。');
+        }
+      } catch (err) {
+        console.error('Tracking OCR error:', err);
+        showToast('読み取りエラー。手入力してください。');
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+async function completeShipping() {
+  if (!selectedItem) return;
+
+  const carrier = document.getElementById('shippingCarrier').value;
+  const tracking = document.getElementById('shippingTracking').value.trim();
+
+  if (!carrier) { showToast('運送会社を選択してください'); return; }
+  if (!tracking && carrier !== '購入者引取') { showToast('追跡番号を入力してください'); return; }
+
+  // ローカルデータ更新
+  const data = loadLocalData();
+  const idx = data.items.findIndex(i => i.mgmtNum === selectedItem.mgmtNum);
+  if (idx >= 0) {
+    data.items[idx].shipped = true;
+    data.items[idx].carrier = carrier;
+    data.items[idx].trackingNumber = tracking;
+    data.items[idx].shippedAt = new Date().toISOString();
+    data.items[idx].status = '出荷済';
+    saveLocalData(data);
+  }
+
+  // GASに送信
+  sendToGAS({
+    action: 'shipping_update',
+    kanri_bango: selectedItem.mgmtNum,
+    carrier: carrier,
+    tracking_number: tracking,
+    staff_id: currentUser.name,
+    timestamp: formatTimestamp(),
+  });
+
+  showToast('🚚 ' + selectedItem.mgmtNum + ' 出荷完了');
+  closeItemDetail();
+  renderStockList();
 }
 
 // ====== 在庫検索 ======

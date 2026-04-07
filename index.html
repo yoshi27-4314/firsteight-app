@@ -6,7 +6,7 @@
 <title>ファーストエイト</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C2541">
-<link rel="stylesheet" href="css/style.css?v=20260407h">
+<link rel="stylesheet" href="css/style.css?v=20260407i">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -201,6 +201,73 @@
             </div>
             <div class="stock-name">昭和レトロ ガラス花瓶 3点セット</div>
             <div class="stock-meta">分荷: 平野光雄 ・ ヤフオクまとめ ・ ¥3,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品詳細モーダル -->
+    <div id="itemDetailOverlay" class="modal-overlay" onclick="closeItemDetail()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="detailMgmtNum">2604-0031</h3>
+          <button class="modal-close" onclick="closeItemDetail()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row">
+            <span class="detail-label">商品名</span>
+            <span class="detail-value" id="detailName">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">メーカー</span>
+            <span class="detail-value" id="detailMaker">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">チャンネル</span>
+            <span class="detail-value" id="detailChannel">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">予想価格</span>
+            <span class="detail-value" id="detailPrice">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">状態</span>
+            <span class="detail-value" id="detailCondition">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">サイズ</span>
+            <span class="detail-value" id="detailSize">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">保管場所</span>
+            <span class="detail-value" id="detailLocation">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">ステータス</span>
+            <span class="detail-value" id="detailStatus">—</span>
+          </div>
+
+          <!-- 出荷登録セクション -->
+          <div id="shippingSection" style="margin-top:20px; border-top: 2px solid var(--gold); padding-top:16px;">
+            <h3 class="section-title">🚚 出荷登録</h3>
+            <div class="form-group">
+              <label>運送会社</label>
+              <select id="shippingCarrier" class="search-input" style="width:100%">
+                <option value="">選択してください</option>
+                <option value="佐川急便">佐川急便</option>
+                <option value="ヤマト運輸">ヤマト運輸</option>
+                <option value="日本郵便">日本郵便</option>
+                <option value="西濃運輸">西濃運輸</option>
+                <option value="購入者引取">購入者引取</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>追跡番号（送り状の写真でもOK）</label>
+              <input type="text" id="shippingTracking" class="search-input" placeholder="追跡番号を入力" style="width:100%">
+              <button class="btn btn-outline" onclick="scanTrackingLabel()" style="margin-top:8px; font-size:14px;">📷 送り状を撮影して読み取る</button>
+              <input type="file" id="trackingPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleTrackingPhoto(event)">
+            </div>
+            <button class="btn btn-primary" onclick="completeShipping()">🚚 出荷完了</button>
           </div>
         </div>
       </div>
@@ -429,7 +496,7 @@
 
 </div>
 
-<script src="js/config.js?v=20260407h"></script>
-<script src="js/app.js?v=20260407h"></script>
+<script src="js/config.js?v=20260407i"></script>
+<script src="js/app.js?v=20260407i"></script>
 </body>
 </html>
