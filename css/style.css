@@ -1,13 +1,13 @@
 /* ファーストエイト業務アプリ - TakeBack Brand Colors */
 :root {
-  --primary: #3D2E2A;
+  --primary: #E8734A;
   --accent: #E8734A;
   --bg: #F8F5EE;
   --card: #ffffff;
-  --text: #3D2E2A;
-  --sub: #7a6e68;
+  --text: #3A3A3A;
+  --sub: #7a7a7a;
   --border: #e8e0d8;
-  --shadow: rgba(61,46,42,0.08);
+  --shadow: rgba(58,58,58,0.08);
   --success: #2d8a4e;
   --warn: #c4a032;
   --danger: #c44032;
