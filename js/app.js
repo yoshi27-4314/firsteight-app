@@ -68,6 +68,7 @@ function showMainScreen() {
   updateHomeStats();
   renderStockList();
   checkTodayAttendance();
+  startNotificationPolling();
 }
 
 // 自動ログイン
@@ -1167,9 +1168,157 @@ function closeHelp() {
   document.getElementById('helpOverlay').classList.remove('open');
 }
 
-// ====== 通知 ======
+// ====== 通知システム ======
+let notifications = [];
+let notifPollTimer = null;
+
+function startNotificationPolling() {
+  // 30秒ごとにチェック
+  fetchNotifications();
+  notifPollTimer = setInterval(fetchNotifications, 30000);
+}
+
+function stopNotificationPolling() {
+  if (notifPollTimer) clearInterval(notifPollTimer);
+}
+
+async function fetchNotifications() {
+  try {
+    // ローカルデータから承認待ちを取得
+    const items = getItems();
+    const pending = items.filter(i => i.needsApproval && !i.approved && !i.rejected);
+
+    // 通知を構築
+    notifications = [];
+    pending.forEach(item => {
+      notifications.push({
+        id: item.mgmtNum,
+        type: 'approval',
+        title: '承認待ち',
+        body: `${item.mgmtNum} ${item.productName || '商品'} ¥${item.estimatedPrice?.max?.toLocaleString() || '---'}`,
+        item: item,
+        timestamp: item.createdAt,
+      });
+    });
+
+    // バッジ更新
+    const badge = document.getElementById('notifBadge');
+    if (notifications.length > 0) {
+      badge.textContent = notifications.length;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('通知取得エラー:', err);
+  }
+}
+
 function showNotifications() {
-  showToast('🔔 通知一覧（次回アップデートで実装）');
+  if (notifications.length === 0) {
+    showToast('新しい通知はありません');
+    return;
+  }
+  document.getElementById('notifOverlay').classList.add('open');
+  renderNotificationList();
+}
+
+function closeNotifications() {
+  document.getElementById('notifOverlay').classList.remove('open');
+}
+
+function renderNotificationList() {
+  const list = document.getElementById('notifList');
+  let html = '';
+  notifications.forEach(n => {
+    const time = n.timestamp ? new Date(n.timestamp).toLocaleString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '';
+    html += `
+      <div class="notif-item" onclick="openApproval('${n.id}')">
+        <div class="notif-item-header">
+          <span class="notice-badge notice-danger">${n.title}</span>
+          <span class="notif-time">${time}</span>
+        </div>
+        <div class="notif-body">${escapeHtml(n.body)}</div>
+      </div>
+    `;
+  });
+  list.innerHTML = html || '<p style="text-align:center; color:var(--sub); padding:20px;">通知はありません</p>';
+}
+
+function openApproval(mgmtNum) {
+  closeNotifications();
+  const items = getItems();
+  const item = items.find(i => i.mgmtNum === mgmtNum);
+  if (!item) return;
+
+  // 承認モーダルを開く
+  selectedItem = item;
+  document.getElementById('approvalMgmtNum').textContent = item.mgmtNum;
+  document.getElementById('approvalProduct').textContent = item.productName || '—';
+  document.getElementById('approvalChannel').textContent = item.channel || '—';
+  document.getElementById('approvalPrice').textContent = item.estimatedPrice
+    ? `¥${item.estimatedPrice.min?.toLocaleString()}〜¥${item.estimatedPrice.max?.toLocaleString()}`
+    : '—';
+  document.getElementById('approvalReason').textContent = item.approvalReason || '高額品';
+  document.getElementById('approvalOverlay').classList.add('open');
+}
+
+function closeApproval() {
+  document.getElementById('approvalOverlay').classList.remove('open');
+}
+
+function approveItem() {
+  if (!selectedItem) return;
+  const data = loadLocalData();
+  const idx = data.items.findIndex(i => i.mgmtNum === selectedItem.mgmtNum);
+  if (idx >= 0) {
+    data.items[idx].approved = true;
+    data.items[idx].approvedAt = new Date().toISOString();
+    data.items[idx].approvedBy = currentUser.name;
+    saveLocalData(data);
+  }
+
+  sendToGAS({
+    action: 'approval',
+    kanri_bango: selectedItem.mgmtNum,
+    result: '承認',
+    approved_by: currentUser.name,
+    timestamp: formatTimestamp(),
+  });
+
+  showToast('✅ ' + selectedItem.mgmtNum + ' 承認しました');
+  closeApproval();
+  fetchNotifications();
+  updateHomeStats();
+}
+
+function rejectItem() {
+  if (!selectedItem) return;
+  const comment = prompt('差し戻し理由を入力してください：');
+  if (comment === null) return;
+
+  const data = loadLocalData();
+  const idx = data.items.findIndex(i => i.mgmtNum === selectedItem.mgmtNum);
+  if (idx >= 0) {
+    data.items[idx].rejected = true;
+    data.items[idx].rejectedAt = new Date().toISOString();
+    data.items[idx].rejectedBy = currentUser.name;
+    data.items[idx].rejectReason = comment;
+    saveLocalData(data);
+  }
+
+  sendToGAS({
+    action: 'approval',
+    kanri_bango: selectedItem.mgmtNum,
+    result: '差し戻し',
+    comment: comment,
+    approved_by: currentUser.name,
+    timestamp: formatTimestamp(),
+  });
+
+  showToast('↩️ ' + selectedItem.mgmtNum + ' 差し戻しました');
+  closeApproval();
+  fetchNotifications();
 }
 
 // ====== ユーティリティ ======

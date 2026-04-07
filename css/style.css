@@ -213,6 +213,17 @@ body {
 .quick-btn:active { background: var(--border); }
 .quick-btn span:first-child { font-size: 22px; }
 
+/* ====== NOTIFICATIONS ====== */
+.notif-item {
+  background: var(--card); border-radius: 10px; padding: 12px 14px;
+  margin-bottom: 8px; cursor: pointer; box-shadow: 0 1px 4px var(--shadow);
+  border-left: 3px solid var(--danger); transition: background 0.2s;
+}
+.notif-item:active { background: var(--border); }
+.notif-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.notif-time { font-size: 11px; color: var(--sub); }
+.notif-body { font-size: 13px; color: var(--text); }
+
 /* ====== HELP ====== */
 .help-section { margin-bottom: 16px; }
 .help-section h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text); }

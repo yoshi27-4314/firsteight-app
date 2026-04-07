@@ -6,7 +6,7 @@
 <title>ファーストエイト</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C2541">
-<link rel="stylesheet" href="css/style.css?v=20260407m">
+<link rel="stylesheet" href="css/style.css?v=20260408a">
 <script src="https://unpkg.com/@zxing/browser@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -292,6 +292,55 @@
               <input type="file" id="trackingPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleTrackingPhoto(event)">
             </div>
             <button class="btn btn-primary" onclick="completeShipping()">🚚 出荷完了</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通知一覧モーダル -->
+    <div id="notifOverlay" class="modal-overlay" onclick="closeNotifications()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 style="color:var(--text)">🔔 通知</h3>
+          <button class="modal-close" onclick="closeNotifications()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="notifList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 承認モーダル -->
+    <div id="approvalOverlay" class="modal-overlay" onclick="closeApproval()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 style="color:var(--danger)">⚠️ 承認待ち</h3>
+          <button class="modal-close" onclick="closeApproval()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row">
+            <span class="detail-label">管理番号</span>
+            <span class="detail-value" id="approvalMgmtNum" style="color:var(--gold); font-weight:700">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">商品名</span>
+            <span class="detail-value" id="approvalProduct">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">チャンネル</span>
+            <span class="detail-value" id="approvalChannel">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">予想価格</span>
+            <span class="detail-value" id="approvalPrice" style="color:var(--gold); font-weight:700">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">承認理由</span>
+            <span class="detail-value" id="approvalReason" style="color:var(--danger)">—</span>
+          </div>
+          <div style="margin-top:20px; display:flex; gap:12px;">
+            <button class="btn btn-primary" onclick="approveItem()" style="flex:1">✅ 承認</button>
+            <button class="btn btn-outline" onclick="rejectItem()" style="flex:1; color:var(--danger); border-color:var(--danger)">↩️ 差し戻し</button>
           </div>
         </div>
       </div>
@@ -690,7 +739,7 @@
 
 </div>
 
-<script src="js/config.js?v=20260407m"></script>
-<script src="js/app.js?v=20260407m"></script>
+<script src="js/config.js?v=20260408a"></script>
+<script src="js/app.js?v=20260408a"></script>
 </body>
 </html>
