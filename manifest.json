@@ -1,0 +1,10 @@
+{
+  "name": "ファーストエイト",
+  "short_name": "F8",
+  "description": "ファーストエイトグループ業務アプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8F5EE",
+  "theme_color": "#0A1C2E",
+  "icons": []
+}

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ファーストエイト</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A1C2E">
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="loginScreen" class="screen active">
+  <div class="login-container">
+    <div class="login-logo">
+      <div class="login-icon">F8</div>
+      <h1>ファーストエイト</h1>
+      <p class="login-sub">業務アプリ</p>
+    </div>
+    <div class="login-form">
+      <div class="form-group">
+        <label>スタッフ名</label>
+        <select id="loginStaff">
+          <option value="">選択してください</option>
+          <option value="林和人">林和人</option>
+          <option value="横山優">横山優</option>
+          <option value="平野光雄">平野光雄</option>
+          <option value="三島圭織">三島圭織</option>
+          <option value="桃井侑菜">桃井侑菜</option>
+          <option value="伊藤佐和子">伊藤佐和子</option>
+          <option value="奥村亜優李">奥村亜優李</option>
+          <option value="浅野儀頼">浅野儀頼（管理者）</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">ログイン</button>
+    </div>
+    <p class="login-note">※ 本番ではGoogle認証 + PIN/生体認証になります</p>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div id="mainScreen" class="screen">
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">F8</span>
+      <span class="header-title">ファーストエイト</span>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" onclick="showNotifications()">
+        <span class="notif-icon">🔔</span>
+        <span id="notifBadge" class="notif-badge" style="display:none">3</span>
+      </button>
+      <button class="icon-btn" onclick="switchTab('mypage')">⚙️</button>
+    </div>
+  </header>
+
+  <!-- タブコンテンツ -->
+  <main class="content">
+
+    <!-- ホームタブ -->
+    <div id="tab-home" class="tab-content active">
+      <div class="greeting">
+        <h2>おはようございます、<span id="staffName">林</span>さん</h2>
+        <p class="greeting-date" id="todayDate"></p>
+      </div>
+
+      <div class="section">
+        <h3 class="section-title">📊 今日の作業</h3>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="statBunka">0</div>
+            <div class="stat-label">分荷判定</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statSatsuei">0</div>
+            <div class="stat-label">撮影</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statShuppin">0</div>
+            <div class="stat-label">出品</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statKonpo">0</div>
+            <div class="stat-label">梱包</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3 class="section-title">📋 お知らせ</h3>
+        <div class="notice-list" id="noticeList">
+          <div class="notice-item">
+            <span class="notice-badge notice-approve">承認済</span>
+            <span>管理番号 2604-0023 が承認されました</span>
+          </div>
+          <div class="notice-item">
+            <span class="notice-badge notice-wait">相談中</span>
+            <span>高額品 3件が浅野さん確認待ちです</span>
+          </div>
+          <div class="notice-item">
+            <span class="notice-badge notice-info">連絡</span>
+            <span>本日の配置：分荷→撮影の順で作業</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="camera-start-btn" onclick="switchTab('camera')">
+        <span class="camera-start-icon">📷</span>
+        <span>撮影を開始する</span>
+      </button>
+    </div>
+
+    <!-- 在庫タブ -->
+    <div id="tab-stock" class="tab-content">
+      <div class="search-bar">
+        <input type="text" id="stockSearch" placeholder="管理番号 or キーワードで検索" class="search-input">
+        <button class="search-btn" onclick="searchStock()">🔍</button>
+      </div>
+      <div class="section">
+        <h3 class="section-title">📦 最近の登録</h3>
+        <div id="stockList" class="card-list">
+          <div class="stock-card">
+            <div class="stock-header">
+              <span class="stock-number">2604-0031</span>
+              <span class="stock-status status-shooting">撮影待ち</span>
+            </div>
+            <div class="stock-name">ビンテージ テーブルランプ</div>
+            <div class="stock-meta">分荷: 林和人 ・ ヤフオクビンテージ ・ ¥12,000</div>
+          </div>
+          <div class="stock-card">
+            <div class="stock-header">
+              <span class="stock-number">2604-0030</span>
+              <span class="stock-status status-listing">出品待ち</span>
+            </div>
+            <div class="stock-name">SONY トランジスタラジオ ICF-506</div>
+            <div class="stock-meta">分荷: 横山優 ・ ヤフオク現行 ・ ¥4,500</div>
+          </div>
+          <div class="stock-card">
+            <div class="stock-header">
+              <span class="stock-number">2604-0029</span>
+              <span class="stock-status status-listed">出品中</span>
+            </div>
+            <div class="stock-name">昭和レトロ ガラス花瓶 3点セット</div>
+            <div class="stock-meta">分荷: 平野光雄 ・ ヤフオクまとめ ・ ¥3,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 撮影タブ -->
+    <div id="tab-camera" class="tab-content">
+      <!-- ステップ1: 写真撮影 -->
+      <div id="cameraStep1" class="camera-step active">
+        <div class="camera-guide">
+          <h3>📷 1枚目：全体写真</h3>
+          <p>基準物（テプラ等）を商品の横に置いて撮影してください</p>
+          <div class="guide-illustration">
+            <div class="guide-box">
+              <div class="guide-product">商品</div>
+              <div class="guide-reference">基準物</div>
+            </div>
+          </div>
+        </div>
+        <div class="camera-area" id="cameraArea">
+          <div class="camera-placeholder" onclick="takePhoto()">
+            <span class="camera-icon">📷</span>
+            <span>タップして撮影</span>
+          </div>
+          <img id="preview1" class="photo-preview" style="display:none">
+        </div>
+        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event, 1)">
+        <div id="afterPhoto1" style="display:none">
+          <button class="btn btn-primary" onclick="analyzePhoto()">🤖 AIに判定させる</button>
+          <button class="btn btn-outline" onclick="retakePhoto(1)">撮り直す</button>
+        </div>
+      </div>
+
+      <!-- ステップ2: AI判定結果 -->
+      <div id="cameraStep2" class="camera-step">
+        <div class="ai-result">
+          <div class="ai-header">
+            <span class="ai-icon">🤖</span>
+            <span>AI判定結果</span>
+          </div>
+          <div class="ai-card">
+            <div class="ai-row">
+              <span class="ai-label">商品名</span>
+              <span class="ai-value" id="aiProductName">—</span>
+            </div>
+            <div class="ai-row">
+              <span class="ai-label">カテゴリ</span>
+              <span class="ai-value" id="aiCategory">—</span>
+            </div>
+            <div class="ai-row">
+              <span class="ai-label">状態</span>
+              <span class="ai-value" id="aiCondition">—</span>
+            </div>
+            <div class="ai-row">
+              <span class="ai-label">販売チャンネル</span>
+              <span class="ai-value ai-highlight" id="aiChannel">—</span>
+            </div>
+            <div class="ai-row">
+              <span class="ai-label">予想価格</span>
+              <span class="ai-value ai-highlight" id="aiPrice">—</span>
+            </div>
+            <div class="ai-row">
+              <span class="ai-label">推定サイズ</span>
+              <span class="ai-value" id="aiSize">—</span>
+            </div>
+          </div>
+          <div class="ai-actions">
+            <button class="btn btn-primary" onclick="acceptJudgment()">✅ OK</button>
+            <button class="btn btn-warn" onclick="consultAsano()">🙋 相談する</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ステップ3: 追加撮影ガイド -->
+      <div id="cameraStep3" class="camera-step">
+        <div class="camera-guide">
+          <h3>📸 追加写真を撮ってください</h3>
+          <p id="guideText">この商品に合った撮り方をガイドします</p>
+        </div>
+        <div class="photo-guide-list" id="photoGuideList">
+          <!-- JSで動的に生成 -->
+        </div>
+        <div id="afterAllPhotos" style="display:none">
+          <button class="btn btn-primary" onclick="goToStep4()">次へ →</button>
+        </div>
+      </div>
+
+      <!-- ステップ4: 保管場所 -->
+      <div id="cameraStep4" class="camera-step">
+        <div class="section">
+          <h3 class="section-title">📍 保管場所を選択</h3>
+          <div class="location-grid">
+            <button class="location-btn" onclick="selectLocation('A-1')">A-1</button>
+            <button class="location-btn" onclick="selectLocation('A-2')">A-2</button>
+            <button class="location-btn" onclick="selectLocation('A-3')">A-3</button>
+            <button class="location-btn" onclick="selectLocation('B-1')">B-1</button>
+            <button class="location-btn" onclick="selectLocation('B-2')">B-2</button>
+            <button class="location-btn" onclick="selectLocation('B-3')">B-3</button>
+            <button class="location-btn" onclick="selectLocation('C-1')">C-1</button>
+            <button class="location-btn" onclick="selectLocation('C-2')">C-2</button>
+            <button class="location-btn" onclick="selectLocation('C-3')">C-3</button>
+          </div>
+          <div class="form-group" style="margin-top:16px">
+            <input type="text" id="locationCustom" placeholder="その他（自由入力）" class="search-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- ステップ5: 完了 -->
+      <div id="cameraStep5" class="camera-step">
+        <div class="complete-screen">
+          <div class="complete-icon">✅</div>
+          <h2>登録完了</h2>
+          <div class="complete-summary">
+            <p>管理番号: <strong id="completeMgmtNum">2604-0032</strong></p>
+            <p>商品: <span id="completeProduct">—</span></p>
+            <p>チャンネル: <span id="completeChannel">—</span></p>
+            <p>保管場所: <span id="completeLocation">—</span></p>
+          </div>
+          <button class="btn btn-primary" onclick="startNewItem()">📷 次の商品を撮影</button>
+          <button class="btn btn-outline" onclick="switchTab('home')">🏠 ホームに戻る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- チャットタブ -->
+    <div id="tab-chat" class="tab-content">
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg bot">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-bubble">こんにちは！社内ルールや業務について質問があればお気軽にどうぞ。浅野さんへの相談も承ります。</div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <button class="chat-consult-btn" onclick="startConsultation()">🙋 浅野さんに相談</button>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="質問を入力..." class="chat-input">
+            <button class="chat-send-btn" onclick="sendChat()">送信</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- マイページタブ -->
+    <div id="tab-mypage" class="tab-content">
+      <div class="mypage-header">
+        <div class="mypage-avatar">👤</div>
+        <h3 id="mypageName">林和人</h3>
+        <p class="mypage-role">スタッフ</p>
+      </div>
+      <div class="section">
+        <h3 class="section-title">📊 今月の実績</h3>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-number">156</div>
+            <div class="stat-label">分荷判定</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">203</div>
+            <div class="stat-label">撮影</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">89</div>
+            <div class="stat-label">出品</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">34</div>
+            <div class="stat-label">梱包</div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <button class="btn btn-outline" onclick="doLogout()" style="width:100%">ログアウト</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ボトムナビ -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home')" data-tab="home">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">ホーム</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('stock')" data-tab="stock">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">在庫</span>
+    </button>
+    <button class="nav-item nav-camera" onclick="switchTab('camera')" data-tab="camera">
+      <span class="nav-icon">📷</span>
+      <span class="nav-label">撮影</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('chat')" data-tab="chat">
+      <span class="nav-icon">💬</span>
+      <span class="nav-label">チャット</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('mypage')" data-tab="mypage">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">マイページ</span>
+    </button>
+  </nav>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
