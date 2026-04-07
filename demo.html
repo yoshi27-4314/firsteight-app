@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>カラーデモ - 3事業</title>
+<title>カラーデモ - 4事業</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -33,6 +33,78 @@ h1 {
   width: 100%; height: 100%; overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+/* ============ FIRSTEIGHT (本体) ============ */
+.f8 { background: #ffffff; }
+.f8 .hdr {
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  background: #ffffff; position: sticky; top: 0; z-index: 10;
+  border-bottom: 3px solid #81D8D0;
+}
+.f8 .hdr-logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #2E8BC0; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;
+}
+.f8 .hdr-title { font-size: 15px; font-weight: 700; color: #1a3a5c; margin-left: 8px; }
+.f8 .hdr-left { display: flex; align-items: center; }
+.f8 .hdr-right { display: flex; gap: 8px; font-size: 18px; }
+.f8 .body { padding: 16px; }
+.f8 .hero {
+  background: #2E8BC0;
+  border-radius: 16px; padding: 24px 20px; color: #fff; margin-bottom: 20px;
+  position: relative; overflow: hidden;
+}
+.f8 .hero h2 { font-size: 20px; font-weight: 700; }
+.f8 .hero p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+.f8 .hero-cta {
+  display: inline-block; margin-top: 14px; padding: 10px 24px;
+  background: #F5C518; color: #1a3a5c; border-radius: 10px;
+  font-size: 14px; font-weight: 700; border: none;
+}
+.f8 .section-title { font-size: 14px; font-weight: 700; color: #1a3a5c; margin-bottom: 10px; }
+.f8 .division-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.f8 .div-card {
+  border-radius: 14px; padding: 18px 14px; text-align: center;
+  font-size: 13px; font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.f8 .div-icon { font-size: 28px; margin-bottom: 8px; }
+.f8 .d-tb { background: #fff; border: 2px solid #C5A258; color: #1C2541; }
+.f8 .d-cm { background: #fff; border: 2px solid #FDD100; color: #2C2C2C; }
+.f8 .d-aix { background: #fff; border: 2px solid #81D8D0; color: #2E8BC0; }
+.f8 .d-new { background: #fff; border: 2px dashed #ccc; color: #aaa; }
+.f8 .kpi-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.f8 .kpi {
+  flex: 1; background: #fff; border-radius: 12px; padding: 14px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-top: 3px solid #81D8D0;
+}
+.f8 .kpi-num { font-size: 22px; font-weight: 700; color: #2E8BC0; }
+.f8 .kpi-label { font-size: 10px; color: #7a8a9a; margin-top: 2px; }
+.f8 .news-item {
+  background: #fff; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px; font-size: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.f8 .news-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; white-space: nowrap;
+}
+.f8 .nb-blue { background: #e0f2fa; color: #2E8BC0; }
+.f8 .nb-yellow { background: #fef8e0; color: #a08a10; }
+.f8 .nb-tiffany { background: #e0f6f4; color: #2a8a82; }
+
+.f8 .bnav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; background: #fff; border-top: 1px solid #e8eaee;
+  padding: 8px 0 16px;
+}
+.f8 .bnav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  font-size: 10px; color: #7a8a9a; gap: 2px;
+}
+.f8 .bnav-item.active { color: #2E8BC0; font-weight: 700; }
+.f8 .bnav-icon { font-size: 20px; }
+
 /* ============ TAKEBACK ============ */
 .tb { background: #F8F5EE; }
 .tb .hdr {
@@ -73,7 +145,7 @@ h1 {
 }
 .tb .product-img {
   width: 100%; height: 160px; object-fit: cover;
-  background: linear-gradient(135deg, #d4c5a9 0%, #e8dcc8 50%, #c9b896 100%);
+  background: #e8dcc8;
   display: flex; align-items: center; justify-content: center;
   color: #8a7a5a; font-size: 40px; position: relative;
 }
@@ -103,7 +175,7 @@ h1 {
 .tb .camera-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 16px; border-radius: 14px; border: none;
-  background: linear-gradient(135deg, #006B3F, #008a50); color: #fff;
+  background: #006B3F; color: #fff;
   font-size: 16px; font-weight: 700; margin-top: 16px;
   box-shadow: 0 4px 16px rgba(0,107,63,0.25);
 }
@@ -165,7 +237,7 @@ h1 {
 }
 .cm .job-img {
   width: 100%; height: 120px;
-  background: linear-gradient(135deg, #e8e2d0 0%, #d6cdb8 50%, #ccc4b0 100%);
+  background: #e0d8c8;
   display: flex; align-items: center; justify-content: center;
   color: #8a8068; font-size: 36px; position: relative;
 }
@@ -212,11 +284,11 @@ h1 {
   padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
   background: #F8F5EE; position: sticky; top: 0; z-index: 10;
   border-bottom: 2px solid transparent;
-  border-image: linear-gradient(90deg, #E87CA0, #6BB8D6, #B0B8C4, #8CC63F) 1;
+  border-bottom: 2px solid #E87CA0;
 }
 .aix .hdr-logo {
   width: 32px; height: 32px; border-radius: 8px;
-  background: linear-gradient(135deg, #E87CA0, #6BB8D6); color: #fff;
+  background: #E87CA0; color: #fff;
   display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
 }
 .aix .hdr-title { font-size: 15px; font-weight: 700; color: #3a3a3a; margin-left: 8px; }
@@ -235,10 +307,10 @@ h1 {
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 .aix .service-icon { font-size: 28px; margin-bottom: 8px; }
-.aix .s-pink { background: linear-gradient(135deg, #E87CA0, #f4a0b8); }
-.aix .s-blue { background: linear-gradient(135deg, #6BB8D6, #8dcce6); }
-.aix .s-silver { background: linear-gradient(135deg, #9aa0aa, #B0B8C4); }
-.aix .s-green { background: linear-gradient(135deg, #7ab534, #8CC63F); }
+.aix .s-pink { background: #E87CA0; }
+.aix .s-blue { background: #6BB8D6; }
+.aix .s-silver { background: #B0B8C4; }
+.aix .s-green { background: #8CC63F; }
 
 /* 提案書カード */
 .aix .proposal-card {
@@ -278,7 +350,66 @@ h1 {
 </head>
 <body>
 
-<h1>ファーストエイトグループ カラーデモ（3事業）</h1>
+<h1>ファーストエイトグループ カラーデモ（4事業）</h1>
+
+<!-- ========== ファーストエイト本体 ========== -->
+<div>
+<div class="phone">
+<div class="phone-inner f8">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo">F8</div>
+      <span class="hdr-title">ファーストエイト</span>
+    </div>
+    <div class="hdr-right">🔔 ⚙️</div>
+  </div>
+  <div class="body" style="padding-bottom:80px;">
+    <div class="hero">
+      <h2>おはようございます、浅野さん</h2>
+      <p>アスカラグループ 経営ダッシュボード</p>
+      <button class="hero-cta">📊 レポートを見る</button>
+    </div>
+
+    <div class="section-title">🏢 事業部</div>
+    <div class="division-grid">
+      <div class="div-card d-tb"><div class="div-icon">📦</div>テイクバック</div>
+      <div class="div-card d-cm"><div class="div-icon">🔨</div>クリアメンテ</div>
+      <div class="div-card d-aix"><div class="div-icon">🤖</div>AIX事業部</div>
+      <div class="div-card d-new"><div class="div-icon">＋</div>新規事業</div>
+    </div>
+
+    <div class="section-title">📈 今月のKPI</div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-num">¥2.8M</div><div class="kpi-label">売上</div></div>
+      <div class="kpi"><div class="kpi-num">348</div><div class="kpi-label">処理件数</div></div>
+      <div class="kpi"><div class="kpi-num">92%</div><div class="kpi-label">稼働率</div></div>
+    </div>
+
+    <div class="section-title">📋 最新ニュース</div>
+    <div class="news-item">
+      <span class="news-badge nb-yellow">売上</span>
+      <span>テイクバック 4月売上 ¥1.2M（前月比+15%）</span>
+    </div>
+    <div class="news-item">
+      <span class="news-badge nb-blue">案件</span>
+      <span>クリアメンテ 新規見積2件追加</span>
+    </div>
+    <div class="news-item">
+      <span class="news-badge nb-tiffany">AIX</span>
+      <span>OKABE GROUP 開発フェーズ2開始</span>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="bnav-item active"><span class="bnav-icon">🏠</span>ホーム</div>
+    <div class="bnav-item"><span class="bnav-icon">📊</span>経営</div>
+    <div class="bnav-item"><span class="bnav-icon">💬</span>AI</div>
+    <div class="bnav-item"><span class="bnav-icon">📋</span>タスク</div>
+    <div class="bnav-item"><span class="bnav-icon">⚙️</span>設定</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">ファーストエイト（本体）</div>
+</div>
 
 <!-- ========== テイクバック ========== -->
 <div>
