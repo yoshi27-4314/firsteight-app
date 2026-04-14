@@ -1116,9 +1116,18 @@ function getSelectedMentions() {
   return Array.from(checkboxes).map(cb => cb.value);
 }
 
+let mentionOpen = false;
+
 function toggleMentionList() {
   const list = document.getElementById('mentionList');
-  list.style.display = list.style.display === 'none' ? '' : 'none';
+  mentionOpen = !mentionOpen;
+  list.style.display = mentionOpen ? '' : 'none';
+}
+
+function closeMentionList() {
+  const list = document.getElementById('mentionList');
+  if (list) list.style.display = 'none';
+  mentionOpen = false;
 }
 
 function updateMentionButton() {
@@ -1138,11 +1147,15 @@ document.addEventListener('change', (e) => {
   }
 });
 
-// メンションリスト外タップで閉じる
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.mention-selector')) {
-    const list = document.getElementById('mentionList');
-    if (list) list.style.display = 'none';
+// メンションリスト外タップで閉じる（タッチ対応）
+document.addEventListener('touchstart', (e) => {
+  if (mentionOpen && !e.target.closest('.mention-selector')) {
+    closeMentionList();
+  }
+}, { passive: true });
+document.addEventListener('mousedown', (e) => {
+  if (mentionOpen && !e.target.closest('.mention-selector')) {
+    closeMentionList();
   }
 });
 

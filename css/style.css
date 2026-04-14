@@ -835,11 +835,10 @@ body[data-theme="female"] {
   text-align: left; cursor: pointer;
 }
 .mention-list {
-  position: absolute; bottom: 100%; left: 0; right: 0;
-  background: var(--primary); border: 1px solid #2A3553; border-radius: 8px;
-  max-height: 240px; overflow-y: auto; z-index: 50;
-  box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
-  margin-bottom: 4px;
+  position: absolute; bottom: calc(100% + 4px); left: 0; right: 0;
+  background: #1C2541; border: 1px solid #3A4563; border-radius: 8px;
+  max-height: 280px; overflow-y: auto; z-index: 200;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
 }
 .mention-item {
   display: flex; align-items: center; gap: 8px;
