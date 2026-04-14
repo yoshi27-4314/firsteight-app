@@ -2582,6 +2582,118 @@ function markChangelogRead() {
   }
 }
 
+// ====== 売上登録 ======
+function openSalesModal() {
+  document.getElementById('salesStep1').style.display = '';
+  document.getElementById('salesStep2').style.display = 'none';
+  document.getElementById('salesOverlay').style.display = 'flex';
+}
+
+function closeSalesModal() {
+  document.getElementById('salesOverlay').style.display = 'none';
+}
+
+function openSalesManual() {
+  document.getElementById('salesStep1').style.display = 'none';
+  document.getElementById('salesStep2').style.display = '';
+  // 粗利計算リスナー
+  ['salesPrice', 'salesFee', 'salesShipping'].forEach(id => {
+    document.getElementById(id).oninput = calcSalesProfit;
+  });
+}
+
+function takeSalesPhoto() {
+  document.getElementById('salesPhotoInput').click();
+}
+
+async function handleSalesPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  document.getElementById('salesLoading').style.display = '';
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const dataUrl = e.target.result;
+    try {
+      const platform = document.getElementById('salesPlatform').value;
+      const response = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-judge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': CONFIG.SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          image: dataUrl,
+          step: 'receipt',
+          context: {
+            task: `この${platform}の落札・売上画面のスクリーンショットから情報をJSON形式で読み取ってください: {"itemName":"商品名","price":落札価格数値,"fee":手数料数値,"shipping":送料数値,"buyer":"落札者ID","mgmtNum":"管理番号（あれば）"}`
+          },
+        }),
+      });
+
+      const result = await response.json();
+      document.getElementById('salesLoading').style.display = 'none';
+
+      if (result.success && result.judgment) {
+        const j = result.judgment;
+        document.getElementById('salesItemName').value = j.itemName || j.item_name || '';
+        document.getElementById('salesPrice').value = j.price || j.amount || '';
+        document.getElementById('salesFee').value = j.fee || 0;
+        document.getElementById('salesShipping').value = j.shipping || 0;
+        document.getElementById('salesBuyer').value = j.buyer || '';
+        document.getElementById('salesMgmtNum').value = j.mgmtNum || j.kanri_bango || '';
+      }
+      openSalesManual();
+      calcSalesProfit();
+    } catch (err) {
+      document.getElementById('salesLoading').style.display = 'none';
+      showToast('読み取りに失敗しました');
+      openSalesManual();
+    }
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function calcSalesProfit() {
+  const price = parseInt(document.getElementById('salesPrice').value) || 0;
+  const fee = parseInt(document.getElementById('salesFee').value) || 0;
+  const shipping = parseInt(document.getElementById('salesShipping').value) || 0;
+  const profit = price - fee - shipping;
+  document.getElementById('salesProfit').textContent = '¥' + profit.toLocaleString();
+  document.getElementById('salesProfit').style.color = profit >= 0 ? 'var(--accent)' : 'var(--danger)';
+}
+
+function submitSales() {
+  const price = document.getElementById('salesPrice').value;
+  if (!price) { showToast('落札価格を入力してください'); return; }
+
+  const payload = {
+    action: 'sales_register',
+    mgmtNum: document.getElementById('salesMgmtNum').value,
+    itemName: document.getElementById('salesItemName').value,
+    price: parseInt(price) || 0,
+    fee: parseInt(document.getElementById('salesFee').value) || 0,
+    shipping: parseInt(document.getElementById('salesShipping').value) || 0,
+    buyer: document.getElementById('salesBuyer').value,
+    channel: document.getElementById('salesChannel').value,
+    platform: document.getElementById('salesPlatform').value,
+    staff: currentUser.name,
+    timestamp: formatTimestamp(),
+  };
+
+  sendToGAS(payload);
+
+  // ローカル保存
+  const salesData = JSON.parse(localStorage.getItem('f8_sales') || '[]');
+  salesData.unshift({ ...payload, createdAt: new Date().toISOString() });
+  localStorage.setItem('f8_sales', JSON.stringify(salesData));
+
+  showToast('売上を登録しました');
+  closeSalesModal();
+}
+
 // ====== 休み希望・連絡 ======
 let selectedLeaveType = '';
 

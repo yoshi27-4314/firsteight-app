@@ -140,14 +140,17 @@
       </button>
 
       <div class="quick-actions">
+        <button class="quick-btn" onclick="openSalesModal()">
+          <span>💰</span><span>売上登録</span>
+        </button>
         <button class="quick-btn" onclick="openReceiptModal()">
           <span>🧾</span><span>経費精算</span>
         </button>
-        <button class="quick-btn" onclick="showHelp()">
-          <span>❓</span><span>ヘルプ</span>
-        </button>
         <button class="quick-btn" onclick="switchTab('stock')">
           <span>🚚</span><span>出荷登録</span>
+        </button>
+        <button class="quick-btn" onclick="showHelp()">
+          <span>❓</span><span>ヘルプ</span>
         </button>
       </div>
 
@@ -383,6 +386,86 @@
             </div>
             <button class="btn btn-primary" onclick="submitReceipt()">✅ 登録する</button>
             <button class="btn btn-outline" onclick="closeReceiptModal()">キャンセル</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 売上登録モーダル -->
+    <div id="salesOverlay" class="modal-overlay" onclick="closeSalesModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 style="color:var(--text)">💰 売上登録</h3>
+          <button class="modal-close" onclick="closeSalesModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- ステップ1: スクショ撮影 -->
+          <div id="salesStep1">
+            <p style="font-size:13px; color:var(--sub); margin-bottom:12px">落札画面・売上画面のスクリーンショットを撮影してください。AIが自動で読み取ります。</p>
+            <div class="form-group">
+              <label>プラットフォーム</label>
+              <select id="salesPlatform" class="search-input" style="width:100%">
+                <option value="ヤフオク">ヤフオク</option>
+                <option value="eBay">eBay</option>
+                <option value="Amazon">Amazon</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="takeSalesPhoto()">📷 スクリーンショットを撮影</button>
+            <p style="font-size:12px; color:var(--sub); margin-top:8px; text-align:center">または</p>
+            <button class="btn btn-outline" onclick="openSalesManual()" style="margin-top:4px">✏️ 手入力で登録</button>
+            <input type="file" id="salesPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleSalesPhoto(event)">
+            <div id="salesLoading" style="display:none; text-align:center; padding:20px; color:var(--sub)">
+              🤖 画面を読み取り中...
+            </div>
+          </div>
+          <!-- ステップ2: OCR結果確認 / 手入力 -->
+          <div id="salesStep2" style="display:none">
+            <div class="form-group">
+              <label>管理番号</label>
+              <input type="text" id="salesMgmtNum" class="search-input" placeholder="例: 2604-0001" style="width:100%">
+            </div>
+            <div class="form-group">
+              <label>商品名</label>
+              <input type="text" id="salesItemName" class="search-input" style="width:100%">
+            </div>
+            <div class="form-group">
+              <label>落札価格（税込）</label>
+              <input type="number" id="salesPrice" class="search-input" style="width:100%">
+            </div>
+            <div class="form-group">
+              <label>手数料</label>
+              <input type="number" id="salesFee" class="search-input" placeholder="0" style="width:100%">
+            </div>
+            <div class="form-group">
+              <label>送料</label>
+              <input type="number" id="salesShipping" class="search-input" placeholder="0" style="width:100%">
+            </div>
+            <div class="form-group">
+              <label>落札者</label>
+              <input type="text" id="salesBuyer" class="search-input" placeholder="落札者ID（任意）" style="width:100%">
+            </div>
+            <div class="form-group">
+              <label>販売チャンネル</label>
+              <select id="salesChannel" class="search-input" style="width:100%">
+                <option value="アイロンポット">アイロンポット（ヤフオク）</option>
+                <option value="ブロカント">ブロカント（ヤフオク）</option>
+                <option value="eBay">eBay</option>
+                <option value="Amazon書籍">Amazon書籍</option>
+                <option value="渡辺質店">渡辺質店</option>
+                <option value="ビッグスポーツ">ビッグスポーツ</option>
+                <option value="シマチヨ">シマチヨ</option>
+                <option value="ロット販売">ロット販売</option>
+              </select>
+            </div>
+            <div style="background:var(--card); border-radius:10px; padding:12px; margin:12px 0; box-shadow:0 1px 3px var(--shadow);">
+              <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--sub);">
+                <span>粗利</span>
+                <span id="salesProfit" style="font-weight:700; color:var(--text)">¥0</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="submitSales()">✅ 売上を登録</button>
+            <button class="btn btn-outline" onclick="closeSalesModal()">キャンセル</button>
           </div>
         </div>
       </div>
