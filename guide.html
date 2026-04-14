@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>テイクバック業務アプリ 使い方ガイド</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #0B1426;
+  color: #E8E8E8;
+  line-height: 1.8;
+  padding: 20px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+h1 {
+  text-align: center;
+  color: #C5A258;
+  font-size: 24px;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.subtitle {
+  text-align: center;
+  color: #8892A4;
+  font-size: 13px;
+  margin-bottom: 32px;
+}
+h2 {
+  color: #C5A258;
+  font-size: 18px;
+  margin-top: 36px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #2A3553;
+}
+h3 {
+  color: #E8E8E8;
+  font-size: 15px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+p, li { font-size: 14px; color: #C0C8D8; }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { margin-bottom: 6px; }
+.flow {
+  background: #1C2541;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  border-left: 3px solid #C5A258;
+}
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.flow-step:last-child { margin-bottom: 0; }
+.step-num {
+  background: #C5A258;
+  color: #0B1426;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-text { font-size: 14px; color: #E8E8E8; }
+.tab-overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+}
+.tab-card {
+  background: #1C2541;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.tab-card .icon { font-size: 28px; margin-bottom: 6px; }
+.tab-card .name { font-size: 14px; font-weight: 700; color: #E8E8E8; }
+.tab-card .desc { font-size: 11px; color: #8892A4; margin-top: 4px; }
+.note {
+  background: #1a2035;
+  border: 1px solid #2A3553;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  font-size: 13px;
+  color: #8892A4;
+}
+.note strong { color: #C5A258; }
+.channel-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.channel-table th {
+  background: #1C2541;
+  color: #C5A258;
+  padding: 8px;
+  text-align: left;
+  font-weight: 500;
+}
+.channel-table td {
+  padding: 8px;
+  border-bottom: 1px solid #1C2541;
+  color: #C0C8D8;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge-gold { background: #C5A258; color: #0B1426; }
+.badge-green { background: #006B3F; color: #fff; }
+.badge-red { background: #CE2029; color: #fff; }
+.url-box {
+  background: #1C2541;
+  border: 2px solid #C5A258;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  margin: 16px 0;
+}
+.url-box a {
+  color: #C5A258;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  word-break: break-all;
+}
+.section-divider {
+  border: none;
+  border-top: 1px solid #2A3553;
+  margin: 32px 0;
+}
+</style>
+</head>
+<body>
+
+<h1>テイクバック 業務アプリ</h1>
+<p class="subtitle">流通事業部 スタッフ向け使い方ガイド</p>
+
+<div class="url-box">
+  <p style="font-size:12px; color:#8892A4; margin-bottom:6px;">アプリURL（ブックマークしてください）</p>
+  <a href="https://yoshi27-4314.github.io/firsteight-app/">https://yoshi27-4314.github.io/firsteight-app/</a>
+  <p style="font-size:11px; color:#8892A4; margin-top:8px;">Android / iPhone どちらでもOK</p>
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== 全体像 ====== -->
+<h2>アプリの全体像</h2>
+<p>画面下の5つのタブで全業務を行います。</p>
+
+<div class="tab-overview">
+  <div class="tab-card">
+    <div class="icon">🏠</div>
+    <div class="name">ホーム</div>
+    <div class="desc">今日の実績・ボトルネック・お知らせ</div>
+  </div>
+  <div class="tab-card">
+    <div class="icon">📦</div>
+    <div class="name">在庫</div>
+    <div class="desc">商品検索・出荷登録</div>
+  </div>
+  <div class="tab-card">
+    <div class="icon">📷</div>
+    <div class="name">撮影</div>
+    <div class="desc">分荷判定・商品登録</div>
+  </div>
+  <div class="tab-card">
+    <div class="icon">💬</div>
+    <div class="name">チャット</div>
+    <div class="desc">AI質問・社内メッセージ</div>
+  </div>
+  <div class="tab-card">
+    <div class="icon">👤</div>
+    <div class="name">マイページ</div>
+    <div class="desc">出退勤・プロフィール</div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== ログイン ====== -->
+<h2>1. ログイン</h2>
+<p>アプリを開いたら、自分の名前を選んで「ログイン」をタップします。</p>
+<div class="note">
+  <strong>※</strong> 現在はスタッフ選択式です。本番ではGoogle認証 + PIN/生体認証になります。
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== 分荷判定 ====== -->
+<h2>2. 分荷判定（メインの業務）</h2>
+<p>商品を撮影すると、AIが自動で販売チャンネルを判定します。</p>
+
+<div class="flow">
+  <div class="flow-step">
+    <span class="step-num">1</span>
+    <span class="step-text">ホーム画面の「📷 撮影を開始する」をタップ</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">2</span>
+    <span class="step-text"><strong>種別を選択</strong>：自社 / ビッグスポーツ / 渡辺質店 / シマチヨ</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">3</span>
+    <span class="step-text">「📷 写真で登録」をタップ → 商品の横に基準物（テプラ等）を置いて撮影</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">4</span>
+    <span class="step-text">「🤖 AIに判定させる」をタップ → AI判定結果が表示される</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">5</span>
+    <span class="step-text">結果を確認して「✅ OK」または「🙋 相談する」を選択</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">6</span>
+    <span class="step-text">追加写真の撮影ガイドに従って撮影（型番ラベル・状態詳細など）</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">7</span>
+    <span class="step-text">保管場所を選択（A-1〜C-3 または自由入力）</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">8</span>
+    <span class="step-text">登録完了！ 管理番号が発行されます</span>
+  </div>
+</div>
+
+<h3>AI判定で表示される情報</h3>
+<ul>
+  <li><strong>商品名</strong> — AIが写真から特定</li>
+  <li><strong>カテゴリ</strong> — 家電/家具/食器/衣類/雑貨/ビンテージ/その他</li>
+  <li><strong>状態ランク</strong> — S（新品同様）〜D（ジャンク）</li>
+  <li><strong>販売チャンネル</strong> — 9種類から最適な1つをAIが選択</li>
+  <li><strong>予想価格</strong> — 下限〜上限の範囲</li>
+  <li><strong>推定サイズ</strong> — 基準物との比較で推定</li>
+</ul>
+
+<h3>販売チャンネル一覧（9種）</h3>
+<table class="channel-table">
+  <tr><th>#</th><th>チャンネル</th><th>対象</th></tr>
+  <tr><td>1</td><td>eBayシングル</td><td>海外向け高値単品</td></tr>
+  <tr><td>2</td><td>eBayまとめ</td><td>海外向けまとめ売り</td></tr>
+  <tr><td>3</td><td>ヤフオクビンテージ</td><td>昭和レトロ・骨董</td></tr>
+  <tr><td>4</td><td>ヤフオク現行</td><td>現行品シングル</td></tr>
+  <tr><td>5</td><td>ヤフオクまとめ</td><td>まとめ売り</td></tr>
+  <tr><td>6</td><td>ロット販売</td><td>業者向けまとめ</td></tr>
+  <tr><td>7</td><td>社内利用</td><td>会社で使う</td></tr>
+  <tr><td>8</td><td>スクラップ</td><td>金属資源として売却</td></tr>
+  <tr><td>9</td><td>廃棄</td><td>処分</td></tr>
+</table>
+
+<div class="note">
+  <strong>浅野承認が必要な商品</strong>（AIが自動判定）<br>
+  ・予想販売価格 ¥30,000以上<br>
+  ・希少品・コレクターズアイテム<br>
+  ・アンティーク・骨董<br>
+  ・貴金属・宝石・アクセサリー<br>
+  ・AIの判断に自信がないもの
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== バーコード ====== -->
+<h2>3. バーコード登録（本）</h2>
+<p>書籍はバーコード（ISBN）をスキャンして登録できます。</p>
+
+<div class="flow">
+  <div class="flow-step">
+    <span class="step-num">1</span>
+    <span class="step-text">撮影タブ → 種別選択 → 「📱 バーコードで登録」をタップ</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">2</span>
+    <span class="step-text">本のバーコードにカメラを向ける → 自動でISBNを読み取り</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">3</span>
+    <span class="step-text">書籍情報が表示されたら「🤖 AIに判定させる」をタップ</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">4</span>
+    <span class="step-text">以降は写真登録と同じ流れ</span>
+  </div>
+</div>
+
+<div class="note">
+  <strong>※</strong> バーコード登録は桃井さん・浅野のみ利用可能です。
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== 在庫・出荷 ====== -->
+<h2>4. 在庫確認・出荷登録</h2>
+
+<h3>在庫検索</h3>
+<p>在庫タブで管理番号やキーワードで商品を検索できます。ステータス（全件/登録済/承認待ち/出品中/出荷済）でフィルターも可能です。</p>
+
+<h3>出荷登録</h3>
+<div class="flow">
+  <div class="flow-step">
+    <span class="step-num">1</span>
+    <span class="step-text">在庫タブで出荷する商品をタップ</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">2</span>
+    <span class="step-text">運送会社を選択（佐川/ヤマト/日本郵便/西濃/購入者引取）</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">3</span>
+    <span class="step-text">追跡番号を入力、または「📷 送り状を撮影して読み取る」でOCR</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">4</span>
+    <span class="step-text">「🚚 出荷完了」をタップ</span>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== 経費精算 ====== -->
+<h2>5. 経費精算</h2>
+<div class="flow">
+  <div class="flow-step">
+    <span class="step-num">1</span>
+    <span class="step-text">ホーム画面の「🧾 経費精算」をタップ</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">2</span>
+    <span class="step-text">事業部を選択（テイクバック or クリアメンテ）</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">3</span>
+    <span class="step-text">レシートを撮影 → AIが日付・店舗・金額・科目を自動読み取り</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">4</span>
+    <span class="step-text">内容を確認・修正して「✅ 登録する」</span>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ====== チャット ====== -->
+<h2>6. チャット</h2>
+<p>AIアシスタントへの質問や、スタッフ間のメッセージに使います。</p>
+<ul>
+  <li><strong>🤖 AIアシスタント</strong> — 社内ルール・業務フローについて回答</li>
+  <li><strong>👤 浅野儀頼</strong> — 浅野さんに相談・報告</li>
+  <li><strong>📢 全員</strong> — 全スタッフに連絡</li>
+  <li><strong>👤 個人名</strong> — 個別メッセージ</li>
+</ul>
+
+<hr class="section-divider">
+
+<!-- ====== 出退勤 ====== -->
+<h2>7. 出退勤</h2>
+<div class="flow">
+  <div class="flow-step">
+    <span class="step-num">1</span>
+    <span class="step-text">マイページタブを開く</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">2</span>
+    <span class="step-text">出勤・退勤時刻をタップして時計で設定</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">3</span>
+    <span class="step-text">休憩時間を設定（休憩なしの場合はチェック）</span>
+  </div>
+  <div class="flow-step">
+    <span class="step-num">4</span>
+    <span class="step-text">「送信」をタップ</span>
+  </div>
+</div>
+<p>月間カレンダーで出勤日・勤務時間の履歴も確認できます。修正が必要な場合は「修正を依頼・相談」から浅野さんに連絡してください。</p>
+
+<hr class="section-divider">
+
+<!-- ====== マイページ ====== -->
+<h2>8. マイページ</h2>
+<ul>
+  <li><strong>プロフィール写真</strong> — アバターをタップして変更・トリミング</li>
+  <li><strong>背景画像</strong> — 背景エリアをタップして変更</li>
+  <li><strong>テーマ切替</strong> — 左上のアイコンでブルー/ピンクテーマを切替</li>
+  <li><strong>月間実績</strong> — 分荷判定・撮影・出品・梱包の月間カウント</li>
+  <li><strong>ログアウト</strong> — 画面最下部</li>
+</ul>
+
+<hr class="section-divider">
+
+<!-- ====== ホーム画面の見方 ====== -->
+<h2>9. ホーム画面の見方</h2>
+
+<h3>⚠️ ボトルネック</h3>
+<p>工程ごとの滞留数を表示します。バーが赤く伸びていたら、そこが詰まっています。</p>
+<ul>
+  <li><strong>📸 撮影待ち</strong> — 登録済みだが写真がまだない商品</li>
+  <li><strong>📝 出品待ち</strong> — 撮影済みだが出品情報がない商品</li>
+  <li><strong>📦 梱包待ち</strong> — 出品中だがまだ出荷していない商品</li>
+</ul>
+
+<h3>📊 今日の実績</h3>
+<p>自分が今日処理した件数がリアルタイムで表示されます。</p>
+
+<h3>📋 お知らせ</h3>
+<p>承認待ち・承認済・出荷完了などの通知が表示されます。</p>
+
+<h3>👥 今日の出勤</h3>
+<p>タップすると展開され、出勤中のメンバーの勤務時間タイムラインが見られます。</p>
+
+<hr class="section-divider">
+
+<div class="note" style="text-align:center; border-color:#C5A258;">
+  <strong>困ったときは</strong><br>
+  アプリ内の「❓ ヘルプ」ボタン、またはチャットでAIに質問してください。<br>
+  解決しない場合は浅野さんに相談してください。
+</div>
+
+<p style="text-align:center; color:#5a6272; font-size:11px; margin-top:32px;">
+  ファーストエイトグループ テイクバック流通事業部<br>
+  ver. 2026.04
+</p>
+
+</body>
+</html>
