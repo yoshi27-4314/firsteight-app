@@ -522,20 +522,54 @@ function updateHomeStats() {
 }
 
 // ====== ボトルネック ======
+async function fetchInventoryStatus() {
+  try {
+    const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({ type: 'db', sheet: '商品マスタ' }),
+    });
+    const data = await res.json();
+    if (!data.success || !data.data?.sheets?.[0]) return null;
+    const rows = data.data.sheets[0].rows;
+    const headers = data.data.sheets[0].headers;
+    const statusIdx = headers.indexOf('ステータス');
+    if (statusIdx < 0) return null;
+
+    const counts = {};
+    rows.forEach(r => {
+      const s = r[statusIdx] || '未設定';
+      counts[s] = (counts[s] || 0) + 1;
+    });
+    return counts;
+  } catch(e) {
+    console.log('[在庫ステータス取得エラー]', e);
+    return null;
+  }
+}
+
 function updateBottleneck(items) {
-  // リアルデータ（Monday.com/スプレッドシートから取得した在庫ステータス）
-  const inv = CONFIG.CURRENT_INVENTORY || {};
-  const satsueiWait = inv['撮影待ち'] || 0;
-  const shuppinWait = inv['出品待ち'] || 0;
-  const konpoWait = inv['梱包待ち'] || 0;
+  // スプレッドシートから取得した在庫ステータス（非同期で更新）
+  if (!window._inventoryLoaded) {
+    window._inventoryLoaded = true;
+    fetchInventoryStatus().then(counts => {
+      if (counts) {
+        window._inventoryCounts = counts;
+        updateBottleneckUI(counts);
+      }
+    });
+  }
+  // キャッシュがあれば使う
+  const inv = window._inventoryCounts || CONFIG.CURRENT_INVENTORY || {};
+  updateBottleneckUI(inv);
+}
 
-  // ローカルの今日の登録分を加算
-  const todayLocal = items.filter(i => {
-    const today = new Date().toISOString().slice(0, 10);
-    return i.createdAt && i.createdAt.startsWith(today);
-  }).length;
+function updateBottleneckUI(inv) {
+  const satsueiWait = (inv['分荷確定'] || 0);
+  const shuppinWait = (inv['出品待ち'] || 0);
+  const konpoWait = (inv['梱包作業'] || 0);
 
-  const maxItems = 200; // バー100%の基準値
+  const maxItems = 200;
 
   const setBar = (id, count) => {
     const el = document.getElementById(id);
