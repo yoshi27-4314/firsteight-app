@@ -1450,45 +1450,38 @@ function consultAsano() {
 const PHOTO_STYLE_GUIDE = {
   'ヤフオクビンテージ': {
     style: '古道具タグボート風',
-    tips: '自然光で撮影。木目や布の背景で雰囲気を出す。正面からやや見下ろす角度。余白を多めに。',
+    tips: '自然光。木目や布の背景。正面目線で余白多め。上から撮らない。',
     guides: [
-      { title: '正面全体（メイン画像）', description: '商品を正面から撮影。背景は木目の台や白布。上からではなく正面目線で。余白を左右均等に。' },
-      { title: '銘・刻印・陶印', description: '底面や背面の銘・刻印を接写。古美術としての価値を証明する重要な写真。' },
-      { title: '質感・素材感', description: '素材の質感が伝わるアップ。焼き物の釉薬、木目、金属の光沢など。' },
-      { title: '傷・欠け・修復跡', description: '経年の状態を正直に。欠けやヒビがあれば寄って撮影。隠さない。' },
-      { title: '付属品・箱', description: '共箱・共布・栞など付属品があれば。箱の書付も。' },
+      { title: '正面全体（メイン画像）', description: '正面から撮影。背景は木目の台や白布。余白を左右均等に。' },
+      { title: '銘・刻印・底面', description: '底面の銘・刻印を接写。価値の証明。' },
+      { title: '状態・質感', description: '傷・欠け・素材の質感。隠さず正直に。' },
     ],
   },
   'ヤフオク現行': {
     style: '白背景・スペック重視',
-    tips: '白背景で清潔感。正面から水平に撮影。型番が読めることが最重要。',
+    tips: '白背景で清潔感。正面水平。型番が読めること最優先。',
     guides: [
-      { title: '正面全体（メイン画像）', description: '白背景で商品全体を正面から撮影。上からの斜め撮りNG。商品が画面の60-70%を占めるように。' },
-      { title: '型番・スペックラベル', description: '型番・製造番号が読めるように接写。これが検索でヒットする鍵。' },
-      { title: '動作確認', description: '電源ランプ点灯、画面表示など動作状態の証拠写真。' },
-      { title: '傷・汚れ・使用感', description: '目立つ傷や汚れを寄って撮影。コンディションの根拠。' },
-      { title: '付属品一式', description: 'ケーブル・説明書・箱など付属品を並べて1枚。「写真の物が全て」の証拠。' },
+      { title: '正面全体（メイン画像）', description: '白背景で正面から。上からの斜め撮りNG。' },
+      { title: '型番・ラベル', description: '型番・製造番号が読めるように接写。' },
+      { title: '状態・付属品', description: '傷・汚れ + 付属品があれば並べて撮影。' },
     ],
   },
   'eBayシングル': {
     style: '白背景・国際基準',
-    tips: '白背景必須。eBayでは白背景の写真が検索上位に表示されやすい。正面から撮影。',
+    tips: '白背景必須（検索優遇）。正面から。Made in Japanを見せる。',
     guides: [
-      { title: '正面全体（メイン画像）', description: '純白背景で商品を正面から。eBayの検索アルゴリズムは白背景を優遇。上からの撮影NG。' },
-      { title: '背面・底面', description: 'Made in Japanの刻印やブランドマークが海外バイヤーの判断材料。' },
-      { title: 'スケール（サイズ感）', description: '定規やコインを横に置いてサイズ感を伝える。海外バイヤーはcm/inchが分からない。' },
-      { title: 'ディテール・質感', description: '素材感や細工の美しさが伝わるアップ。職人技が分かる写真。' },
-      { title: 'コンディション', description: '傷・欠けを正直に。eBayでは「not as described」の返品リスクがある。' },
+      { title: '正面全体（メイン画像）', description: '純白背景で正面から。上からNG。' },
+      { title: '背面・底面・刻印', description: 'Made in Japanやブランドマーク。' },
+      { title: '状態・サイズ感', description: '傷・欠けを正直に。定規を横に置いてサイズ感を伝える。' },
     ],
   },
   'ヤフオクまとめ': {
     style: '全体俯瞰＋代表品アップ',
-    tips: '全商品を並べた俯瞰写真がメイン。代表的な商品のアップを追加。',
+    tips: '全商品を並べた俯瞰写真がメイン。',
     guides: [
-      { title: '全体俯瞰（メイン画像）', description: '全商品を並べて真上から撮影。点数が分かるように。これがまとめ売りの顔。' },
-      { title: '代表品アップ①', description: '一番良い状態の商品を正面からアップ。セットの質を伝える。' },
-      { title: '代表品アップ②', description: '別の商品のアップ。バリエーションが分かるように。' },
-      { title: '状態の悪いもの', description: '一番状態が悪い商品も撮影。「最悪でもこの程度」を伝える。クレーム防止。' },
+      { title: '全体俯瞰（メイン画像）', description: '全商品を並べて真上から。点数が分かるように。' },
+      { title: '代表品アップ', description: '一番良い状態の商品を正面からアップ。' },
+      { title: '状態の悪いもの', description: '最悪の状態も撮影。クレーム防止。' },
     ],
   },
 };
@@ -1504,12 +1497,11 @@ function buildPhotoGuide() {
     guideText.innerHTML = `<strong>${styleGuide.style}</strong><br>${styleGuide.tips}`;
   }
 
-  // チャンネル別ガイド + AIからの追加ガイド
-  const channelGuides = styleGuide.guides;
+  // チャンネル別ガイド（デフォルト3枚）+ AIからの追加ガイドで最大5枚
+  const channelGuides = styleGuide.guides.slice(0, 3);
   const aiGuides = currentItem.photoGuide || [];
-  const guides = [...channelGuides, ...aiGuides.filter(g =>
-    !channelGuides.some(d => d.title === g.title)
-  )];
+  const extra = aiGuides.filter(g => !channelGuides.some(d => d.title === g.title));
+  const guides = [...channelGuides, ...extra].slice(0, 5);
 
   const list = document.getElementById('photoGuideList');
   list.innerHTML = '';
