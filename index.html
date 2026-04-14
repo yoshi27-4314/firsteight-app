@@ -567,26 +567,46 @@
         <!-- 写真撮影モード -->
         <div id="photoMode" style="display:none">
           <div class="camera-guide">
-            <h3>📷 1枚目：全体写真</h3>
-            <p>基準物（テプラ等）を商品の横に置いて撮影してください</p>
-            <div class="guide-illustration">
-              <div class="guide-box">
-                <div class="guide-product">商品</div>
-                <div class="guide-reference">基準物</div>
-              </div>
+            <h3>📷 商品の写真を撮影</h3>
+            <p class="photo-tip">1枚目は<strong>基準物（テプラ等）を横に置いて全体</strong>を撮影。<br>判定精度を上げるなら、型番ラベル・裏面・傷など<strong>最大5枚</strong>まで追加できます。</p>
+          </div>
+          <!-- 写真プレビューグリッド -->
+          <div class="photo-grid" id="photoGrid">
+            <div class="photo-slot" id="photoSlot1" onclick="takeMultiPhoto(1)">
+              <span class="photo-slot-label">1</span>
+              <span class="photo-slot-hint">全体+基準物</span>
+              <img id="multiPreview1" class="photo-slot-img" style="display:none">
+              <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(1)" style="display:none">✕</button>
+            </div>
+            <div class="photo-slot" id="photoSlot2" onclick="takeMultiPhoto(2)">
+              <span class="photo-slot-label">2</span>
+              <span class="photo-slot-hint">型番ラベル</span>
+              <img id="multiPreview2" class="photo-slot-img" style="display:none">
+              <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(2)" style="display:none">✕</button>
+            </div>
+            <div class="photo-slot" id="photoSlot3" onclick="takeMultiPhoto(3)">
+              <span class="photo-slot-label">3</span>
+              <span class="photo-slot-hint">裏面・底面</span>
+              <img id="multiPreview3" class="photo-slot-img" style="display:none">
+              <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(3)" style="display:none">✕</button>
+            </div>
+            <div class="photo-slot" id="photoSlot4" onclick="takeMultiPhoto(4)">
+              <span class="photo-slot-label">4</span>
+              <span class="photo-slot-hint">傷・汚れ</span>
+              <img id="multiPreview4" class="photo-slot-img" style="display:none">
+              <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(4)" style="display:none">✕</button>
+            </div>
+            <div class="photo-slot" id="photoSlot5" onclick="takeMultiPhoto(5)">
+              <span class="photo-slot-label">5</span>
+              <span class="photo-slot-hint">付属品等</span>
+              <img id="multiPreview5" class="photo-slot-img" style="display:none">
+              <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(5)" style="display:none">✕</button>
             </div>
           </div>
-          <div class="camera-area" id="cameraArea">
-            <div class="camera-placeholder" onclick="takePhoto()">
-              <span class="camera-icon">📷</span>
-              <span>タップして撮影</span>
-            </div>
-            <img id="preview1" class="photo-preview" style="display:none">
-          </div>
-          <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event, 1)">
-          <div id="afterPhoto1" style="display:none">
-            <button class="btn btn-primary" onclick="analyzePhoto()">🤖 AIに判定させる</button>
-            <button class="btn btn-outline" onclick="retakePhoto(1)">撮り直す</button>
+          <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handleMultiPhoto(event)">
+          <p id="photoCount" class="photo-count-msg">まず1枚目を撮影してください</p>
+          <div id="afterPhotos" style="display:none">
+            <button class="btn btn-primary" onclick="analyzePhoto()">🤖 AIに判定させる（<span id="photoCountNum">1</span>枚）</button>
           </div>
         </div>
 

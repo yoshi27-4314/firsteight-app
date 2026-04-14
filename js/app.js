@@ -702,6 +702,7 @@ function resetCameraFlow() {
   currentCategory = null;
   currentBundle = 'single';
   photosTaken = 0;
+  resetMultiPhotos();
   showCameraStep(0);
   // 入口選択に戻す
   const entrySelect = document.getElementById('entrySelect');
@@ -728,27 +729,89 @@ function showCameraStep(step) {
   cameraStep = step;
 }
 
+// ====== 複数写真撮影 ======
+let currentPhotoSlot = 0;
+let multiPhotos = [null, null, null, null, null]; // 最大5枚
+
 function takePhoto() {
+  takeMultiPhoto(1);
+}
+
+function takeMultiPhoto(slot) {
+  currentPhotoSlot = slot;
   document.getElementById('photoInput').click();
 }
 
-function handlePhoto(event, num) {
+function handleMultiPhoto(event) {
   const file = event.target.files[0];
   if (!file) return;
+  const slot = currentPhotoSlot;
 
-  // 画像を圧縮してbase64に変換
   const reader = new FileReader();
   reader.onload = function(e) {
     compressImage(e.target.result, 1200, 0.8, (compressed) => {
-      const preview = document.getElementById('preview1');
+      multiPhotos[slot - 1] = compressed;
+      // プレビュー表示
+      const preview = document.getElementById('multiPreview' + slot);
       preview.src = compressed;
       preview.style.display = 'block';
-      document.querySelector('.camera-placeholder').style.display = 'none';
-      document.getElementById('afterPhoto1').style.display = 'block';
-      currentItem.photo1 = compressed;
+      const slotEl = document.getElementById('photoSlot' + slot);
+      slotEl.classList.add('has-photo');
+      // 削除ボタン表示
+      slotEl.querySelector('.photo-slot-remove').style.display = '';
+      // 1枚目をphoto1にも保持（互換性）
+      if (slot === 1) currentItem.photo1 = compressed;
+      updatePhotoCountUI();
     });
   };
   reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function removeMultiPhoto(slot) {
+  multiPhotos[slot - 1] = null;
+  const preview = document.getElementById('multiPreview' + slot);
+  preview.style.display = 'none';
+  preview.src = '';
+  const slotEl = document.getElementById('photoSlot' + slot);
+  slotEl.classList.remove('has-photo');
+  slotEl.querySelector('.photo-slot-remove').style.display = 'none';
+  if (slot === 1) currentItem.photo1 = null;
+  updatePhotoCountUI();
+}
+
+function updatePhotoCountUI() {
+  const count = multiPhotos.filter(p => p !== null).length;
+  const countMsg = document.getElementById('photoCount');
+  const afterBtn = document.getElementById('afterPhotos');
+  const countNum = document.getElementById('photoCountNum');
+
+  if (count === 0) {
+    countMsg.textContent = 'まず1枚目を撮影してください';
+    afterBtn.style.display = 'none';
+  } else {
+    const tips = [];
+    if (count === 1) tips.push('型番ラベルや裏面の写真を追加すると判定精度が上がります');
+    if (count >= 2) tips.push('判定に十分な情報があります');
+    countMsg.textContent = `${count}枚撮影済み` + (tips.length ? ` — ${tips[0]}` : '');
+    afterBtn.style.display = '';
+    countNum.textContent = count;
+  }
+}
+
+function resetMultiPhotos() {
+  multiPhotos = [null, null, null, null, null];
+  for (let i = 1; i <= 5; i++) {
+    const preview = document.getElementById('multiPreview' + i);
+    if (preview) { preview.style.display = 'none'; preview.src = ''; }
+    const slot = document.getElementById('photoSlot' + i);
+    if (slot) { slot.classList.remove('has-photo'); slot.querySelector('.photo-slot-remove').style.display = 'none'; }
+  }
+  updatePhotoCountUI();
+}
+
+function handlePhoto(event, num) {
+  handleMultiPhoto(event);
 }
 
 // 画像圧縮（モバイルの大きな画像をAPIに送れるサイズにする）
@@ -770,24 +833,23 @@ function compressImage(dataUrl, maxWidth, quality, callback) {
 }
 
 function retakePhoto(num) {
-  document.getElementById('preview1').style.display = 'none';
-  document.getElementById('afterPhoto1').style.display = 'none';
-  document.querySelector('.camera-placeholder').style.display = 'flex';
-  document.getElementById('photoInput').value = '';
+  removeMultiPhoto(num || 1);
 }
 
 // ====== AI判定（本番：Supabase Edge Function経由） ======
 async function analyzePhoto() {
-  if (!currentItem.photo1) {
+  const photos = multiPhotos.filter(p => p !== null);
+  if (photos.length === 0) {
     showToast('写真を撮影してください');
     return;
   }
 
   showToast('🤖 AIが判定中...');
-  const btn = document.querySelector('#afterPhoto1 .btn-primary');
+  const btn = document.querySelector('#afterPhotos .btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = '判定中...'; }
 
   try {
+    // 複数画像対応: imagesフィールドで送信、1枚の場合はimageフィールドも互換
     const response = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-judge', {
       method: 'POST',
       headers: {
@@ -795,7 +857,8 @@ async function analyzePhoto() {
         'apikey': CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
-        image: currentItem.photo1,
+        image: photos[0],
+        images: photos,
         step: 'judge',
       }),
     });
@@ -843,7 +906,8 @@ async function analyzePhoto() {
     console.error('AI判定エラー:', err);
     showToast('通信エラー。もう一度お試しください。');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🤖 AIに判定させる'; }
+    const photoCount = multiPhotos.filter(p => p !== null).length;
+    if (btn) { btn.disabled = false; btn.textContent = `🤖 AIに判定させる（${photoCount}枚）`; }
   }
 }
 

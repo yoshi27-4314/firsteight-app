@@ -1004,6 +1004,45 @@ body[data-theme="female"] {
 .leave-summary-empty {
   font-size: 12px; color: var(--sub); padding: 4px 0;
 }
+/* 複数写真グリッド */
+.photo-tip { font-size: 13px; color: var(--sub); line-height: 1.6; }
+.photo-tip strong { color: var(--text); }
+.photo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  margin: 12px 0;
+}
+.photo-slot {
+  aspect-ratio: 1; border-radius: 12px; border: 2px dashed var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; overflow: hidden;
+  background: var(--card); transition: border-color 0.15s;
+}
+.photo-slot:active { border-color: var(--gold); }
+.photo-slot-label {
+  font-size: 20px; font-weight: 700; color: var(--border);
+}
+.photo-slot-hint {
+  font-size: 10px; color: var(--sub); margin-top: 2px; text-align: center;
+}
+.photo-slot.has-photo {
+  border-style: solid; border-color: var(--gold);
+}
+.photo-slot.has-photo .photo-slot-label,
+.photo-slot.has-photo .photo-slot-hint { display: none; }
+.photo-slot-img {
+  width: 100%; height: 100%; object-fit: cover; position: absolute;
+  top: 0; left: 0; border-radius: 10px;
+}
+.photo-slot-remove {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.6); color: #fff; border: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 12px; cursor: pointer; z-index: 2;
+}
+.photo-count-msg {
+  font-size: 12px; color: var(--sub); text-align: center; margin: 8px 0;
+}
+
 .leave-reason-chips { display: flex; gap: 6px; margin-bottom: 6px; }
 
 /* 管理者：休み管理 */
