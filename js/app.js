@@ -581,46 +581,47 @@ function renderMemberTimeline() {
   const timelineEnd = 21;  // 21時
   const totalHours = timelineEnd - timelineStart;
 
-  // 全スタッフの出勤情報を取得
+  // 全スタッフの出勤情報を取得（基本勤務時間をベースに、実際の出退勤があれば上書き）
+  const dow = new Date().getDay(); // 0=日〜6=土
   const members = [];
   CONFIG.STAFF.forEach(s => {
-    const saved = localStorage.getItem('f8_attendance_' + today + '_detail_' + s.name)
-      || localStorage.getItem('f8_attendance_' + today);
+    // 休日チェック（offDaysに今日の曜日が含まれていたら休み）
+    if (s.offDays && s.offDays.includes(dow)) return;
+    // 土日は全員休み（管理者以外）
+    if ((dow === 0 || dow === 6) && s.role !== 'admin') return;
 
+    // localStorageに実際の出退勤データがあれば優先
+    const saved = localStorage.getItem('f8_attendance_' + today + '_detail_' + s.name);
     if (saved) {
       try {
         const a = JSON.parse(saved);
-        // 自分以外のデータもチェック（名前が一致するか）
-        if (a.staffName && a.staffName !== s.name) return;
         members.push({
           name: s.name,
-          start: a.start || '09:00',
-          end: a.end || '18:00',
+          start: a.start || s.start || '09:00',
+          end: a.end || s.end || '18:00',
           breakStart: a.breakStart || null,
           breakEnd: a.breakEnd || null,
-          noBreak: a.noBreak || false,
+          noBreak: a.noBreak || s.breakMin === 0,
         });
+        return;
       } catch {}
+    }
+
+    // 基本勤務時間から表示
+    if (s.start && s.end) {
+      const breakStart = s.breakMin > 0 ? '12:00' : null;
+      const breakEnd = s.breakMin > 0 ? ('12:' + String(s.breakMin).padStart(2, '0')) : null;
+      members.push({
+        name: s.name,
+        start: s.start,
+        end: s.end,
+        breakStart: breakStart,
+        breakEnd: breakEnd,
+        noBreak: s.breakMin === 0,
+        isDefault: true, // 基本勤務時間（実際の打刻ではない）
+      });
     }
   });
-
-  // 自分の出勤データを確実に含める
-  if (currentUser && !members.find(m => m.name === currentUser.name)) {
-    const mySaved = localStorage.getItem('f8_attendance_' + today);
-    if (mySaved) {
-      try {
-        const a = JSON.parse(mySaved);
-        members.push({
-          name: currentUser.name,
-          start: a.start || '09:00',
-          end: a.end || '18:00',
-          breakStart: a.breakStart || null,
-          breakEnd: a.breakEnd || null,
-          noBreak: a.noBreak || false,
-        });
-      } catch {}
-    }
-  }
 
   // 人数表示
   const countEl = document.getElementById('memberCount');
