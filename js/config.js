@@ -42,7 +42,7 @@ const CONFIG = {
     { name: '横山優', role: 'staff', start: '10:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み' },
     { name: '桃井侑菜', role: 'staff', start: '11:00', end: '15:00', breakMin: 0, offDays: [2,4], pattern: '月水金のみ' },
     { name: '伊藤佐和子', role: 'staff', start: '09:00', end: '15:00', breakMin: 60, offDays: [4], pattern: '木休み' },
-    { name: '奥村亜優李', role: 'staff', start: '10:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み' },
+    { name: '奥村亜優李', role: 'staff', start: '10:00', end: '16:00', breakMin: 60, breakStart: '13:00', breakEnd: '14:00', offDays: [3], pattern: '水休み' },
     { name: '平野光雄', role: 'staff', start: '09:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み', company: 'クリアメンテ' },
     { name: '松本豊彦', role: 'staff', start: '09:00', end: '16:00', breakMin: 60, offDays: [], pattern: '週5日', company: 'クリアメンテ' },
     { name: '北瀬', role: 'staff', start: '09:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み', company: 'クリアメンテ' },
@@ -64,8 +64,8 @@ const CONFIG = {
       '取引ナビ': '奥村亜優李',
       '梱包出荷': '桃井侑菜',
     },
-    2: { // 火
-      '分荷撮影': ['林和人','伊藤佐和子','横山優'],
+    2: { // 火（桃井休み）
+      '分荷撮影': ['林和人','伊藤佐和子','奥村亜優李'],
       '出品': '横山優',
       '取引ナビ': '奥村亜優李',
       '梱包出荷': null,
@@ -76,11 +76,11 @@ const CONFIG = {
       '取引ナビ': null,
       '梱包出荷': '桃井侑菜',
     },
-    4: { // 木
+    4: { // 木（伊藤・桃井休み）
       '分荷撮影': ['林和人','横山優','奥村亜優李'],
       '出品': '奥村亜優李',
       '取引ナビ': '奥村亜優李',
-      '梱包出荷': '桃井侑菜',
+      '梱包出荷': null,
     },
     5: { // 金
       '分荷撮影': ['林和人','伊藤佐和子','横山優','奥村亜優李'],
