@@ -2583,6 +2583,8 @@ async function searchStock() {
         staffName: r[10] || '',
         driveUrl: r[17] || '',
         dataSource: r[18] || '',
+        yahooUrl: r[19] || '',
+        rakusatsuPrice: r[20] || '',
         fromSpreadsheet: true,
       }));
       // ローカルと重複しないものだけ追加
@@ -2600,23 +2602,80 @@ async function searchStock() {
     showToast('「' + q + '」は見つかりませんでした');
   } else {
     showToast(results.length + '件見つかりました');
-    // 検索結果を表示
-    const list = document.getElementById('stockList');
-    let html = '';
-    results.forEach(item => {
-      html += `
-        <div class="stock-card">
-          <div class="stock-header">
-            <span class="stock-number">${item.mgmtNum || '---'}</span>
-            <span class="stock-status status-listing">登録済</span>
-          </div>
-          <div class="stock-name">${escapeHtml(item.productName || '不明')}</div>
-          <div class="stock-meta">${escapeHtml(item.channel || '---')} ・ ¥${item.estimatedPrice?.min?.toLocaleString() || '---'}</div>
-        </div>
-      `;
-    });
-    list.innerHTML = html;
+    renderSearchResults(results, q);
   }
+}
+
+function getNextAction(status) {
+  const actions = {
+    '分荷確定': { text: '撮影してください', icon: '📸', color: '#FF9500' },
+    '出品待ち': { text: '出品してください', icon: '📝', color: '#007AFF' },
+    '出品中': { text: 'ヤフオクで確認', icon: '🔍', color: '#34C759' },
+    '落札済み': { text: '梱包してください', icon: '📦', color: '#FF9500' },
+    '梱包作業': { text: '出荷してください', icon: '🚚', color: '#FF3B30' },
+    '出荷済み': { text: '入金確認', icon: '💰', color: '#34C759' },
+    '完了': { text: '完了', icon: '✅', color: '#8E8E93' },
+    '確認／相談': { text: '浅野に確認', icon: '⚠️', color: '#FF3B30' },
+  };
+  return actions[status] || { text: status || '不明', icon: '📋', color: '#8E8E93' };
+}
+
+function getStatusBadgeClass(status) {
+  if (status === '出品中') return 'status-listing';
+  if (status === '出品待ち') return 'status-shooting';
+  if (status === '分荷確定') return 'status-registered';
+  if (status === '完了') return 'status-shipped';
+  if (status === '梱包作業') return 'status-packing';
+  return 'status-default';
+}
+
+function renderSearchResults(results, query) {
+  const list = document.getElementById('stockList');
+  const titleEl = document.getElementById('stockListTitle');
+  if (titleEl) titleEl.textContent = `🔍 「${query}」の検索結果（${results.length}件）`;
+
+  let html = `<button class="btn btn-outline" onclick="clearSearch()" style="margin-bottom:10px; font-size:12px;">✕ 検索クリア</button>`;
+
+  results.forEach(item => {
+    const status = item.status || '';
+    const action = getNextAction(status);
+    const price = item.estimatedPrice?.max || item.estimatedPrice?.min || item.startPrice || '';
+    const priceText = price ? `¥${Number(price).toLocaleString()}` : '';
+    const yahooUrl = item.yahooUrl || '';
+    const driveUrl = item.driveUrl || '';
+    const source = item.dataSource || '';
+
+    html += `
+      <div class="search-result-card" onclick="openItemDetail('${item.mgmtNum}')">
+        <div class="sr-header">
+          <span class="sr-number">${escapeHtml(item.mgmtNum || '---')}</span>
+          <span class="sr-status" style="background:${action.color}">${escapeHtml(status || '不明')}</span>
+        </div>
+        <div class="sr-name">${escapeHtml(item.productName || '不明')}</div>
+        <div class="sr-details">
+          ${item.channel ? `<span class="sr-tag">${escapeHtml(item.channel)}</span>` : ''}
+          ${priceText ? `<span class="sr-price">${priceText}</span>` : ''}
+          ${item.staffName ? `<span class="sr-staff">👤${escapeHtml(item.staffName.split(/[　 ]/)[0])}</span>` : ''}
+          ${source ? `<span class="sr-source">${escapeHtml(source)}</span>` : ''}
+        </div>
+        <div class="sr-action">
+          <span>${action.icon} ${action.text}</span>
+          <div class="sr-links">
+            ${yahooUrl ? `<a href="${yahooUrl}" target="_blank" onclick="event.stopPropagation()" class="sr-link">🔗ヤフオク</a>` : ''}
+            ${driveUrl ? `<a href="${driveUrl}" target="_blank" onclick="event.stopPropagation()" class="sr-link">📷写真</a>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  list.innerHTML = html;
+}
+
+function clearSearch() {
+  document.getElementById('stockSearch').value = '';
+  document.getElementById('stockListTitle').textContent = '📦 全商品';
+  renderStockList();
 }
 
 // ====== 経費精算 ======

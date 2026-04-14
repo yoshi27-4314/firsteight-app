@@ -808,6 +808,37 @@ body[data-theme="female"] {
 .kpi-bar.over { background: var(--gold); }
 .kpi-count { font-size: 13px; font-weight: 700; color: var(--text); min-width: 60px; text-align: right; }
 
+/* 検索結果カード */
+.search-result-card {
+  background: var(--card); border-radius: 12px; padding: 12px 14px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px var(--shadow); cursor: pointer;
+}
+.search-result-card:active { opacity: 0.8; }
+.sr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.sr-number { font-size: 13px; font-weight: 700; color: var(--gold); }
+.sr-status {
+  font-size: 10px; font-weight: 700; color: #fff; padding: 2px 8px;
+  border-radius: 6px;
+}
+.sr-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.sr-details { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.sr-tag {
+  font-size: 11px; color: var(--sub); background: rgba(0,0,0,0.04);
+  padding: 2px 8px; border-radius: 6px;
+}
+.sr-price { font-size: 12px; font-weight: 700; color: var(--text); }
+.sr-staff { font-size: 11px; color: var(--sub); }
+.sr-source { font-size: 10px; color: var(--sub); opacity: 0.6; }
+.sr-action {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--text); padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.sr-links { display: flex; gap: 8px; }
+.sr-link {
+  font-size: 11px; color: var(--gold); text-decoration: none; font-weight: 600;
+}
+
 /* 実績メモ */
 .stat-note { font-size: 11px; color: var(--sub); text-align: center; margin-top: 8px; }
 
