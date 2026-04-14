@@ -691,10 +691,11 @@ function renderMemberTimeline() {
     `;
   });
 
-  // 時間軸
-  html += '<div class="member-time-axis">';
+  // 時間軸（バーと同じ座標系で配置）
+  html += '<div class="member-time-axis" style="position:relative;height:16px;margin-left:64px;margin-right:50px;">';
   for (let h = timelineStart; h <= timelineEnd; h += 3) {
-    html += `<span class="member-time-tick">${h}:00</span>`;
+    const pct = ((h - timelineStart) / totalHours * 100);
+    html += `<span class="member-time-tick" style="position:absolute;left:${pct}%;transform:translateX(-50%)">${h}:00</span>`;
   }
   html += '</div>';
 

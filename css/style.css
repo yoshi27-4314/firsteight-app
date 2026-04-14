@@ -822,9 +822,9 @@ body[data-theme="female"] {
   white-space: nowrap;
 }
 .member-time-axis {
-  display: flex; justify-content: space-between; padding: 2px 0 0 64px;
+  position: relative; height: 16px; margin-left: 64px; margin-right: 50px;
 }
-.member-time-tick { font-size: 8px; color: var(--sub); }
+.member-time-tick { font-size: 8px; color: var(--sub); position: absolute; transform: translateX(-50%); }
 .member-meta { font-size: 10px; color: var(--sub); min-width: 50px; flex-shrink: 0; white-space: nowrap; }
 
 /* 権限設定 */
