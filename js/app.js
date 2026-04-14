@@ -2721,7 +2721,8 @@ function renderLeaveCalendar() {
 
   title.textContent = `${leaveCalYear}年${leaveCalMonth + 1}月`;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   const firstDay = new Date(leaveCalYear, leaveCalMonth, 1);
   const lastDay = new Date(leaveCalYear, leaveCalMonth + 1, 0);
   const startDow = firstDay.getDay(); // 0=日
@@ -2738,7 +2739,7 @@ function renderLeaveCalendar() {
   for (let d = 1; d <= lastDay.getDate(); d++) {
     const dateStr = `${leaveCalYear}-${String(leaveCalMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = dateStr === today;
-    const isPast = dateStr < today;
+    const isPast = dateStr < today; // 今日は選択可能（当日の急な休み連絡用）
     const isSelected = selectedLeaveDates.includes(dateStr);
     const cls = [
       'leave-cal-day',
@@ -2781,6 +2782,10 @@ function updateLeaveSelectedInfo() {
       `<span class="leave-date-tag">${d}</span>`
     ).join('');
   }
+}
+
+function setLeaveReason(btn) {
+  document.getElementById('leaveReason').value = btn.textContent;
 }
 
 function submitLeaveRequest() {
