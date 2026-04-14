@@ -410,6 +410,18 @@ body {
   box-shadow: 0 1px 4px var(--shadow);
 }
 .chat-msg.user .chat-bubble { background: var(--primary); color: #fff; }
+.chat-bubble-wrap { display: flex; flex-direction: column; max-width: 80%; }
+.chat-meta {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 3px; padding: 0 4px;
+}
+.chat-msg.user .chat-meta { justify-content: flex-end; }
+.chat-time { font-size: 10px; color: var(--sub); }
+.chat-delete {
+  background: none; border: none; color: var(--sub); font-size: 10px;
+  cursor: pointer; padding: 0 2px; opacity: 0.5;
+}
+.chat-delete:hover { opacity: 1; color: var(--danger); }
 .chat-input-area { border-top: 1px solid var(--border); padding-top: 12px; }
 .chat-consult-btn {
   width: 100%; padding: 10px; border-radius: 10px; border: 2px solid var(--accent);
@@ -884,6 +896,47 @@ body[data-theme="female"] {
 .notice-badge.notice-update { background: #007AFF; }
 
 /* メンション モーダル式 */
+/* Google Chat リンク */
+.gchat-links { display: flex; flex-direction: column; gap: 6px; }
+.gchat-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; background: var(--card); border-radius: 12px;
+  text-decoration: none; color: var(--text);
+  box-shadow: 0 1px 3px var(--shadow); transition: opacity 0.15s;
+}
+.gchat-link:active { opacity: 0.7; }
+.gchat-disabled { opacity: 0.4; pointer-events: none; }
+.gchat-icon { font-size: 24px; flex-shrink: 0; }
+.gchat-info { flex: 1; display: flex; flex-direction: column; }
+.gchat-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.gchat-desc { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.gchat-arrow { font-size: 20px; color: var(--sub); flex-shrink: 0; }
+
+/* AI相談チャット */
+.ai-chat-container {
+  display: flex; flex-direction: column;
+  height: calc(100dvh - 380px); min-height: 200px;
+}
+.ai-chat-messages {
+  flex: 1; overflow-y: auto; padding: 0 0 8px 0;
+}
+.ai-chat-suggestions {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 8px 0;
+}
+.suggestion-chip {
+  padding: 6px 14px; border-radius: 18px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--text); font-size: 12px; cursor: pointer;
+  font-family: inherit; transition: all 0.15s;
+}
+.suggestion-chip:active {
+  background: var(--gold); color: #0B1426; border-color: var(--gold);
+}
+.ai-chat-input-area {
+  border-top: 1px solid var(--border); padding-top: 10px;
+}
+
 .chat-mention-bar {
   display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
 }

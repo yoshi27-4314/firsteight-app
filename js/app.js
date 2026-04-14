@@ -1123,77 +1123,27 @@ async function sendToGAS(payload) {
 }
 
 // ====== チャット ======
-let selectedMentions = [];
+// ====== AI相談チャット ======
+let chatMsgId = 0;
 
-function getSelectedMentions() {
-  return selectedMentions;
-}
-
-function openMentionModal() {
-  // 現在の選択状態をチェックボックスに反映
-  document.querySelectorAll('.mention-cb').forEach(cb => {
-    cb.checked = selectedMentions.includes(cb.value);
-  });
-  document.getElementById('mentionOverlay').style.display = 'flex';
-}
-
-function closeMentionModal() {
-  document.getElementById('mentionOverlay').style.display = 'none';
-}
-
-function applyMentions() {
-  const checkboxes = document.querySelectorAll('.mention-cb:checked');
-  selectedMentions = Array.from(checkboxes).map(cb => cb.value);
-  updateMentionTags();
-  closeMentionModal();
-}
-
-function updateMentionTags() {
-  const container = document.getElementById('mentionSelectedTags');
-  if (selectedMentions.length === 0) {
-    container.innerHTML = '<span style="color:var(--sub)">未選択</span>';
-  } else {
-    container.innerHTML = selectedMentions.map(m =>
-      `<span class="mention-tag">@${m}</span>`
-    ).join('');
-  }
-}
-
-function sendChat() {
-  const mentions = getSelectedMentions();
+function sendAIChat() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
-
-  if (mentions.length === 0) { showToast('宛先（@メンション）を選択してください'); return; }
   if (!msg) return;
 
-  const mentionDisplay = mentions.map(m => '@' + m).join(' ');
-  addChatMessage(`${mentionDisplay} ${msg}`, 'user');
+  addChatMessage(msg, 'user');
   input.value = '';
+  // 定型文を非表示
+  const suggestions = document.getElementById('aiSuggestions');
+  if (suggestions) suggestions.style.display = 'none';
 
-  // AI宛があればAIに質問
-  if (mentions.includes('AI')) {
-    chatWithAI(msg);
-  }
+  chatWithAI(msg);
+}
 
-  // 人宛のメッセージ → GASに送信
-  const humanMentions = mentions.filter(m => m !== 'AI');
-  if (humanMentions.length > 0) {
-    sendToGAS({
-      action: 'chat_message',
-      from: currentUser.name,
-      to: humanMentions.join(', '),
-      message: msg,
-      timestamp: formatTimestamp(),
-    });
-    if (!mentions.includes('AI')) {
-      addChatMessage(`${humanMentions.join('さん、')}さんにメッセージを送信しました`, 'bot');
-    }
-  }
-
-  // メンション選択をリセット
-  selectedMentions = [];
-  updateMentionTags();
+function askSuggestion(btn) {
+  const msg = btn.textContent;
+  document.getElementById('chatInput').value = msg;
+  sendAIChat();
 }
 
 async function chatWithAI(msg) {
@@ -1232,15 +1182,36 @@ async function chatWithAI(msg) {
 function addChatMessage(text, type, id) {
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
+  chatMsgId++;
+  const msgId = id || ('msg-' + chatMsgId);
   div.className = 'chat-msg ' + type;
-  if (id) div.id = 'chat-' + id;
+  div.id = 'chat-' + msgId;
   const avatar = type === 'bot' ? '🤖' : '👤';
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const deleteBtn = type === 'user' ? `<button class="chat-delete" onclick="deleteChatMsg('${msgId}')" title="削除">✕</button>` : '';
+
   div.innerHTML = `
     <div class="chat-avatar">${avatar}</div>
-    <div class="chat-bubble">${escapeHtml(text)}</div>
+    <div class="chat-bubble-wrap">
+      <div class="chat-bubble">${escapeHtml(text)}</div>
+      <div class="chat-meta">
+        <span class="chat-time">${timeStr}</span>
+        ${deleteBtn}
+      </div>
+    </div>
   `;
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
+}
+
+function deleteChatMsg(id) {
+  const el = document.getElementById('chat-' + id);
+  if (el) {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.2s';
+    setTimeout(() => el.remove(), 200);
+  }
 }
 
 function removeChatMessage(id) {

@@ -669,89 +669,74 @@
 
     <!-- チャットタブ -->
     <div id="tab-chat" class="tab-content">
-      <div class="chat-container">
-        <div class="chat-messages" id="chatMessages">
-          <div class="chat-msg bot">
-            <div class="chat-avatar">🤖</div>
-            <div class="chat-bubble">こんにちは！社内ルールや業務について質問があればお気軽にどうぞ。浅野さんへの相談も承ります。</div>
-          </div>
-        </div>
-        <div class="chat-input-area">
-          <div class="chat-mention-bar">
-            <button class="mention-open-btn" onclick="openMentionModal()">@ 宛先を選ぶ</button>
-            <div class="mention-selected" id="mentionSelectedTags">未選択</div>
-          </div>
-          <div class="chat-input-row">
-            <input type="text" id="chatInput" placeholder="メッセージを入力..." class="chat-input">
-            <button class="chat-send-btn" onclick="sendChat()">送信</button>
-          </div>
+
+      <!-- Google Chat リンク -->
+      <div class="section">
+        <h3 class="section-title">💬 チームチャット</h3>
+        <p style="font-size:12px; color:var(--sub); margin-bottom:10px;">確認・連絡・報告はGoogle Chatで</p>
+        <div class="gchat-links">
+          <a href="https://chat.google.com/room/AAQAX1QqG7s?cls=7" target="_blank" class="gchat-link">
+            <span class="gchat-icon">🛒</span>
+            <div class="gchat-info">
+              <span class="gchat-name">通販業務｜共有コミュニティ</span>
+              <span class="gchat-desc">通販チームの連絡・相談</span>
+            </div>
+            <span class="gchat-arrow">›</span>
+          </a>
+          <a href="#" class="gchat-link gchat-disabled">
+            <span class="gchat-icon">📦</span>
+            <div class="gchat-info">
+              <span class="gchat-name">分荷作業スタッフ</span>
+              <span class="gchat-desc">通販＋現場チーム合同</span>
+            </div>
+            <span class="gchat-arrow">›</span>
+          </a>
+          <a href="#" class="gchat-link gchat-disabled">
+            <span class="gchat-icon">🕐</span>
+            <div class="gchat-info">
+              <span class="gchat-name">勤怠連絡</span>
+              <span class="gchat-desc">休み希望・勤怠の連絡</span>
+            </div>
+            <span class="gchat-arrow">›</span>
+          </a>
+          <a href="#" class="gchat-link gchat-disabled">
+            <span class="gchat-icon">📢</span>
+            <div class="gchat-info">
+              <span class="gchat-name">社内連絡</span>
+              <span class="gchat-desc">全社共有</span>
+            </div>
+            <span class="gchat-arrow">›</span>
+          </a>
         </div>
       </div>
-    </div>
 
-    <!-- メンション選択モーダル -->
-    <div id="mentionOverlay" class="modal-overlay" onclick="closeMentionModal()">
-      <div class="modal mention-modal" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h3 style="color:var(--text)">@ 宛先を選択</h3>
-          <button class="modal-close" onclick="closeMentionModal()">✕</button>
+      <!-- AI相談 -->
+      <div class="section">
+        <h3 class="section-title">🤖 AI相談</h3>
+        <p style="font-size:12px; color:var(--sub); margin-bottom:10px;">業務ルール・価格相場・出品文の相談など</p>
+      </div>
+
+      <div class="ai-chat-container">
+        <div class="ai-chat-messages" id="chatMessages">
+          <div class="chat-msg bot">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-bubble">
+              業務に関する質問をどうぞ。<br>
+              <span style="font-size:12px; color:var(--sub);">例：「この商品のヤフオク相場は？」「梱包サイズ160で入る？」</span>
+            </div>
+          </div>
         </div>
-        <div class="modal-body" style="padding:8px 0">
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="AI" class="mention-cb">
-            <span class="mention-avatar">🤖</span>
-            <span class="mention-name">AIアシスタント</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="浅野儀頼" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">浅野儀頼</span>
-            <span class="mention-role">管理者</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="全員" class="mention-cb">
-            <span class="mention-avatar">📢</span>
-            <span class="mention-name">全員</span>
-          </label>
-          <div class="mention-divider"></div>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="林和人" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">林和人</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="横山優" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">横山優</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="平野光雄" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">平野光雄</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="三島圭織" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">三島圭織</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="桃井侑菜" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">桃井侑菜</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="伊藤佐和子" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">伊藤佐和子</span>
-          </label>
-          <label class="mention-row" onclick="event.stopPropagation()">
-            <input type="checkbox" value="奥村亜優李" class="mention-cb">
-            <span class="mention-avatar">👤</span>
-            <span class="mention-name">奥村亜優李</span>
-          </label>
+        <div class="ai-chat-suggestions" id="aiSuggestions">
+          <button class="suggestion-chip" onclick="askSuggestion(this)">出品文を作って</button>
+          <button class="suggestion-chip" onclick="askSuggestion(this)">経費の勘定科目は？</button>
+          <button class="suggestion-chip" onclick="askSuggestion(this)">梱包サイズの目安</button>
+          <button class="suggestion-chip" onclick="askSuggestion(this)">業務ルール確認</button>
         </div>
-        <div style="padding:12px 16px">
-          <button class="btn btn-primary" onclick="applyMentions()" style="width:100%">決定</button>
+        <div class="ai-chat-input-area">
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="AIに質問..." class="chat-input" onkeydown="if(event.key==='Enter')sendAIChat()">
+            <button class="chat-send-btn" onclick="sendAIChat()">送信</button>
+          </div>
         </div>
       </div>
     </div>
