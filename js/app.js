@@ -3,6 +3,12 @@
  * テイクバック流通事業 テスト運用版
  */
 
+// ====== テストモード判定 ======
+const IS_TEST_MODE = new URLSearchParams(window.location.search).has('test');
+if (IS_TEST_MODE) {
+  console.log('[テストモード] GAS送信先: テスト用スプレッドシート');
+}
+
 // ====== 状態管理 ======
 let currentUser = null;
 let currentTab = 'home';
@@ -107,6 +113,12 @@ function showMainScreen() {
   }
   updateDate();
   // loadTestData(); // テストデータ無効化（実運用モード）
+  // テストモード表示
+  if (IS_TEST_MODE) {
+    const header = document.querySelector('.header-title');
+    if (header) header.textContent = '【テスト】テイクバック 流通事業部';
+    document.querySelector('.header')?.style.setProperty('border-bottom', '3px solid #FF9500');
+  }
   updateHomeStats();
   renderStockList();
   checkTodayAttendance();
@@ -1110,12 +1122,17 @@ async function uploadToDrive(mgmtNum) {
 
 // ====== GAS連携 ======
 async function sendToGAS(payload) {
+  const url = IS_TEST_MODE ? CONFIG.GAS_URL_TEST : CONFIG.GAS_URL;
+  if (IS_TEST_MODE) {
+    payload._test = true;
+    console.log('[テストモード] GAS送信:', JSON.stringify(payload).slice(0, 200));
+  }
   try {
-    const response = await fetch(CONFIG.GAS_URL, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      mode: 'no-cors', // GASはCORS非対応のためno-cors
+      mode: 'no-cors',
     });
     return true;
   } catch (err) {
@@ -1254,12 +1271,37 @@ function openItemDetail(mgmtNum) {
     shippingSection.style.display = 'block';
   }
 
+  // 管理者用: 削除ボタン表示
+  const deleteBtn = document.getElementById('adminDeleteBtn');
+  if (deleteBtn) {
+    deleteBtn.style.display = currentUser?.isAdmin ? '' : 'none';
+    deleteBtn.onclick = () => deleteItem(mgmtNum);
+  }
+
   document.getElementById('itemDetailOverlay').classList.add('open');
 }
 
 function closeItemDetail() {
   document.getElementById('itemDetailOverlay').classList.remove('open');
   selectedItem = null;
+}
+
+function deleteItem(mgmtNum) {
+  if (!confirm(`${mgmtNum} を削除しますか？`)) return;
+  const data = loadLocalData();
+  data.items = data.items.filter(i => i.mgmtNum !== mgmtNum);
+  saveLocalData(data);
+  // GASにも削除を通知
+  sendToGAS({
+    action: 'delete_item',
+    mgmtNum: mgmtNum,
+    deletedBy: currentUser.name,
+    timestamp: formatTimestamp(),
+  });
+  closeItemDetail();
+  renderStockList();
+  updateHomeStats();
+  showToast(`${mgmtNum} を削除しました`);
 }
 
 function scanTrackingLabel() {
