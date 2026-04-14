@@ -833,15 +833,24 @@ let barcodeReader = null;
 
 async function startBarcodeScanner() {
   try {
+    if (typeof ZXingBrowser === 'undefined') {
+      showToast('バーコードライブラリの読み込みに失敗しました');
+      return;
+    }
     const codeReader = new ZXingBrowser.BrowserMultiFormatReader();
     barcodeReader = codeReader;
     const videoEl = document.getElementById('barcodeVideo');
 
-    const devices = await ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
-    // 背面カメラを優先
-    const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.includes('背面')) || devices[0];
+    let backCameraId = undefined;
+    try {
+      const devices = await ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
+      const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.includes('背面') || d.label.includes('rear')) || devices[0];
+      backCameraId = backCamera?.deviceId;
+    } catch(devErr) {
+      console.log('デバイス一覧取得エラー:', devErr);
+    }
 
-    codeReader.decodeFromVideoDevice(backCamera?.deviceId || undefined, videoEl, (result, err) => {
+    codeReader.decodeFromVideoDevice(backCameraId, videoEl, (result, err) => {
       if (result) {
         const isbn = result.getText();
         console.log('Barcode detected:', isbn);
@@ -849,9 +858,10 @@ async function startBarcodeScanner() {
         handleBarcodeResult(isbn);
       }
     });
+    showToast('📱 バーコードにカメラを向けてください');
   } catch (err) {
     console.error('Barcode scanner error:', err);
-    showToast('カメラを起動できませんでした');
+    showToast('カメラを起動できませんでした: ' + err.message);
   }
 }
 
