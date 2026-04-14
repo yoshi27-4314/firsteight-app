@@ -1073,6 +1073,8 @@ body[data-theme="female"] {
 .duty-name { font-weight: 700; color: var(--text); }
 .duty-wide { }
 .duty-wide .duty-name { font-size: 12px; }
+.duty-absent { opacity: 0.5; border-color: var(--danger); }
+.duty-absent .duty-name { color: var(--danger); font-size: 11px; }
 
 /* 状態確認 */
 .check-item {

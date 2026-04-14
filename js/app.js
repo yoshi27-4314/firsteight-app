@@ -183,6 +183,13 @@ setInterval(() => {
 }, 5000);
 
 // ====== 今日の当番表示 ======
+function getTodayAbsentStaff() {
+  const leaveRequests = JSON.parse(localStorage.getItem('f8_leave_requests') || '[]');
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  return leaveRequests.filter(r => r.date === todayStr && r.type === '欠勤').map(r => r.staffName);
+}
+
 function renderTodayDuty() {
   const container = document.getElementById('dutyCards');
   if (!container) return;
@@ -194,6 +201,7 @@ function renderTodayDuty() {
   if (!duties) { container.innerHTML = ''; return; }
 
   const myName = currentUser?.name || '';
+  const absentStaff = getTodayAbsentStaff();
   const icons = { '分荷撮影': '📷', '出品': '📝', '取引ナビ': '💬', '梱包出荷': '📦' };
 
   let cards = '';
@@ -202,22 +210,33 @@ function renderTodayDuty() {
     const icon = icons[role] || '📋';
 
     if (Array.isArray(staff)) {
-      // 複数人（分荷撮影）
-      const names = staff.map(s => escapeHtml(s.split(/[　 ]/)[0])).join('・');
-      const isMine = staff.includes(myName);
+      // 複数人（分荷撮影）— 欠勤者を除外
+      const activeStaff = staff.filter(s => !absentStaff.includes(s));
+      if (activeStaff.length === 0) continue;
+      const names = activeStaff.map(s => escapeHtml(s.split(/[　 ]/)[0])).join('・');
+      const isMine = activeStaff.includes(myName);
       cards += `<div class="duty-card duty-wide ${isMine ? 'duty-mine' : ''}">
         <span class="duty-icon">${icon}</span>
         <span class="duty-label">${escapeHtml(role)}</span>
         <span class="duty-name">${names}</span>
       </div>`;
     } else {
-      // 1人
-      const isMine = myName === staff;
-      cards += `<div class="duty-card ${isMine ? 'duty-mine' : ''}">
-        <span class="duty-icon">${icon}</span>
-        <span class="duty-label">${escapeHtml(role)}</span>
-        <span class="duty-name">${escapeHtml(staff.split(/[　 ]/)[0])}</span>
-      </div>`;
+      // 1人 — 欠勤なら「不在」表示
+      const isAbsent = absentStaff.includes(staff);
+      if (isAbsent) {
+        cards += `<div class="duty-card duty-absent">
+          <span class="duty-icon">${icon}</span>
+          <span class="duty-label">${escapeHtml(role)}</span>
+          <span class="duty-name">⚠️ ${escapeHtml(staff.split(/[　 ]/)[0])} 不在</span>
+        </div>`;
+      } else {
+        const isMine = myName === staff;
+        cards += `<div class="duty-card ${isMine ? 'duty-mine' : ''}">
+          <span class="duty-icon">${icon}</span>
+          <span class="duty-label">${escapeHtml(role)}</span>
+          <span class="duty-name">${escapeHtml(staff.split(/[　 ]/)[0])}</span>
+        </div>`;
+      }
     }
   }
 
