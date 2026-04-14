@@ -113,7 +113,7 @@ body {
 .section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
 
 /* ====== STAT CARDS ====== */
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .stat-card {
   background: var(--card); border-radius: 12px; padding: 16px;
   text-align: center; box-shadow: 0 2px 8px var(--shadow);
