@@ -1193,6 +1193,84 @@ function goBackToAddPhotos() {
 }
 
 function acceptJudgment() {
+  // 状態確認を先に行う
+  showConditionCheck();
+}
+
+function showConditionCheck() {
+  const type = currentItem.productType || 'normal';
+  const checks = currentItem.checkItems || [];
+
+  // 確認項目がなければデフォルト
+  const defaultChecks = {
+    'normal': ['電源は入りますか？','異音・異臭はありますか？','目立つ傷はありますか？'],
+    'large': ['動作に問題はありますか？','ガタつき・破損はありますか？','目立つ傷はありますか？'],
+    'bundle': ['全品目視で確認しましたか？','破損品は除外しましたか？','点数を数えましたか？'],
+    'no_check': ['外観に問題はありますか？'],
+  };
+  const items = checks.length > 0 ? checks : (defaultChecks[type] || defaultChecks['normal']);
+
+  const list = document.getElementById('conditionCheckList');
+  if (list) {
+    list.innerHTML = items.map((q, i) => `
+      <div class="check-item">
+        <span class="check-question">${escapeHtml(q)}</span>
+        <div class="check-buttons">
+          <button class="check-btn" id="checkYes${i}" onclick="setCheck(${i}, true)">はい</button>
+          <button class="check-btn" id="checkNo${i}" onclick="setCheck(${i}, false)">いいえ</button>
+        </div>
+      </div>
+    `).join('');
+
+    // 大型品はサイズ入力を表示
+    const sizeInput = document.getElementById('manualSizeInput');
+    if (sizeInput) sizeInput.style.display = type === 'large' ? '' : 'none';
+
+    // まとめ売りは数量・重量入力を表示
+    const bundleInput = document.getElementById('bundleCountInput');
+    if (bundleInput) bundleInput.style.display = type === 'bundle' ? '' : 'none';
+  }
+
+  // タイプ別のガイドテキスト
+  const typeLabels = { 'normal': '動作確認', 'large': '大型品確認', 'bundle': 'まとめ品確認', 'no_check': '外観確認' };
+  const titleEl = document.getElementById('conditionCheckTitle');
+  if (titleEl) titleEl.textContent = typeLabels[type] || '状態確認';
+
+  showCameraStep(6); // 新しいステップ6を使う
+}
+
+let checkResults = {};
+function setCheck(idx, value) {
+  checkResults[idx] = value;
+  const yesBtn = document.getElementById('checkYes' + idx);
+  const noBtn = document.getElementById('checkNo' + idx);
+  if (yesBtn) { yesBtn.classList.toggle('active', value); }
+  if (noBtn) { noBtn.classList.toggle('active', !value); }
+}
+
+function completeConditionCheck() {
+  // 確認結果をcurrentItemに保存
+  currentItem.checkResults = checkResults;
+
+  // 大型品のサイズ
+  const manualSize = document.getElementById('manualSizeValue');
+  if (manualSize && manualSize.value) {
+    currentItem.estimatedSize = manualSize.value;
+  }
+
+  // まとめ売りの数量・重量
+  const bundleCount = document.getElementById('bundleCountValue');
+  const bundleWeight = document.getElementById('bundleWeightValue');
+  if (bundleCount && bundleCount.value) currentItem.bundleCount = bundleCount.value;
+  if (bundleWeight && bundleWeight.value) currentItem.bundleWeight = bundleWeight.value;
+
+  checkResults = {};
+
+  // 元のacceptJudgmentの処理を実行
+  finalizeAcceptJudgment();
+}
+
+function finalizeAcceptJudgment() {
   // 渡辺質店の場合、按分比率を確認
   if (currentCategory === 'watanabe') {
     const rate = document.getElementById('anbunRate').value;

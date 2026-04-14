@@ -1085,6 +1085,23 @@ body[data-theme="female"] {
 .duty-wide { grid-column: 1 / -1; }
 .duty-wide .duty-name { font-size: 13px; }
 
+/* 状態確認 */
+.check-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px; background: var(--card); border-radius: 10px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px var(--shadow);
+}
+.check-question { font-size: 14px; color: var(--text); flex: 1; }
+.check-buttons { display: flex; gap: 6px; flex-shrink: 0; }
+.check-btn {
+  padding: 6px 16px; border-radius: 8px; border: 2px solid var(--border);
+  background: var(--card); color: var(--text); font-size: 13px;
+  font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.check-btn.active {
+  border-color: var(--gold); background: var(--gold); color: #0B1426;
+}
+
 /* ステップ戻るボタン */
 .step-back-btn {
   font-size: 13px; margin-bottom: 12px; color: var(--sub);
