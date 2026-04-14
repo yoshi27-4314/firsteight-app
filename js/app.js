@@ -3,6 +3,61 @@
  * テイクバック流通事業 テスト運用版
  */
 
+// ====== 作業中データの保持（リロード・戻る対策） ======
+const SESSION_KEY = 'f8_working_session';
+
+function saveWorkingSession() {
+  const session = {
+    currentItem: currentItem,
+    currentCategory: currentCategory,
+    currentBundle: currentBundle,
+    cameraStep: cameraStep,
+    multiPhotos: multiPhotos,
+    currentTab: currentTab,
+    timestamp: Date.now(),
+  };
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch(e) { /* sessionStorage容量超過時は無視 */ }
+}
+
+function restoreWorkingSession() {
+  try {
+    const saved = sessionStorage.getItem(SESSION_KEY);
+    if (!saved) return false;
+    const session = JSON.parse(saved);
+    // 30分以上前のデータは破棄
+    if (Date.now() - session.timestamp > 30 * 60 * 1000) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return false;
+    }
+    currentItem = session.currentItem || {};
+    currentCategory = session.currentCategory;
+    currentBundle = session.currentBundle || 'single';
+    cameraStep = session.cameraStep || 0;
+    multiPhotos = session.multiPhotos || [null,null,null,null,null];
+    // 写真プレビューを復元
+    for (let i = 0; i < 5; i++) {
+      if (multiPhotos[i]) {
+        const preview = document.getElementById('multiPreview' + (i+1));
+        const slot = document.getElementById('photoSlot' + (i+1));
+        if (preview) { preview.src = multiPhotos[i]; preview.style.display = 'block'; }
+        if (slot) { slot.classList.add('has-photo'); slot.querySelector('.photo-slot-remove').style.display = ''; }
+      }
+    }
+    updatePhotoCountUI();
+    if (cameraStep > 0) {
+      showCameraStep(cameraStep);
+      if (session.currentTab) switchTab(session.currentTab);
+    }
+    return cameraStep > 0;
+  } catch(e) { return false; }
+}
+
+function clearWorkingSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
 // ====== テストモード判定 ======
 const IS_TEST_MODE = new URLSearchParams(window.location.search).has('test');
 if (IS_TEST_MODE) {
@@ -131,6 +186,10 @@ function showMainScreen() {
   renderChangelog();
   renderLeaveHistory();
   renderLeaveCalendar();
+  // 作業中データの復元（リロード対策）
+  if (restoreWorkingSession()) {
+    showToast('作業中のデータを復元しました');
+  }
   const savedTab = localStorage.getItem('f8_current_tab');
   if (savedTab) switchTab(savedTab);
 }
@@ -727,6 +786,8 @@ function showCameraStep(step) {
   const el = document.getElementById('cameraStep' + step);
   if (el) el.classList.add('active');
   cameraStep = step;
+  // 作業中データを保持
+  saveWorkingSession();
 }
 
 // ====== 複数写真撮影 ======
@@ -990,15 +1051,20 @@ function buildPhotoGuide() {
   });
 
   photosTaken = 0;
-  document.getElementById('afterAllPhotos').style.display = 'none';
+  // 「次へ」ボタンは常に表示（追加撮影はオプション）
+  document.getElementById('afterAllPhotos').style.display = 'block';
 }
 
 function takeGuidePhoto(num) {
-  // ガイド写真の撮影（ファイル選択を使う）
-  const input = document.createElement('input');
+  // ガイド写真の撮影（DOMに追加してからclickでモバイル対応）
+  const input = document.getElementById('guidePhotoInput') || document.createElement('input');
+  input.id = 'guidePhotoInput';
   input.type = 'file';
   input.accept = 'image/*';
   input.capture = 'environment';
+  input.style.display = 'none';
+  if (!input.parentNode) document.body.appendChild(input);
+  input.value = '';
   input.onchange = function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -1012,10 +1078,8 @@ function takeGuidePhoto(num) {
         if (btnEl) { btnEl.classList.add('done'); btnEl.textContent = '✓ 完了'; btnEl.onclick = null; }
 
         photosTaken++;
-        const totalGuides = document.querySelectorAll('.photo-guide-item').length;
-        if (photosTaken >= totalGuides) {
-          document.getElementById('afterAllPhotos').style.display = 'block';
-        }
+        // 全部撮らなくても「次へ」を常に表示
+        document.getElementById('afterAllPhotos').style.display = 'block';
       });
     };
     reader.readAsDataURL(file);
@@ -1038,6 +1102,8 @@ function selectLocation(loc) {
 
 // ====== 登録完了 ======
 async function completeRegistration(loc) {
+  // 作業セッションクリア
+  clearWorkingSession();
   // 管理番号生成
   const mgmtNum = generateManagementNumber();
   currentItem.mgmtNum = mgmtNum;
