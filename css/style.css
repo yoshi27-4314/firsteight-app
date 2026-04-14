@@ -788,6 +788,26 @@ body[data-theme="female"] {
 .bn-count { font-size: 16px; font-weight: 700; color: var(--text); flex-shrink: 0; min-width: 50px; text-align: right; }
 .bottleneck-item.alert { border-left: 4px solid var(--danger); }
 
+/* チームKPI進捗 */
+.kpi-grid { display: flex; flex-direction: column; gap: 8px; }
+.kpi-item {
+  background: var(--card); border-radius: 10px; padding: 10px 14px;
+  box-shadow: 0 1px 2px var(--shadow);
+}
+.kpi-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.kpi-icon { font-size: 16px; }
+.kpi-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.kpi-progress { display: flex; align-items: center; gap: 10px; }
+.kpi-bar-bg {
+  flex: 1; height: 8px; background: rgba(0,0,0,0.06); border-radius: 4px; overflow: hidden;
+}
+.kpi-bar {
+  height: 100%; border-radius: 4px; transition: width 0.5s;
+  background: var(--accent);
+}
+.kpi-bar.over { background: var(--gold); }
+.kpi-count { font-size: 13px; font-weight: 700; color: var(--text); min-width: 60px; text-align: right; }
+
 /* 実績メモ */
 .stat-note { font-size: 11px; color: var(--sub); text-align: center; margin-top: 8px; }
 

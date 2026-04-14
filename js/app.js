@@ -465,9 +465,29 @@ function updateHomeStats() {
   todayStats.konpo = todayItems.filter(i => i.shipped).length;
 
   document.getElementById('statBunka').textContent = todayStats.bunka;
-  document.getElementById('statSatsuei').textContent = todayStats.satsuei;
   document.getElementById('statShuppin').textContent = todayStats.shuppin;
   document.getElementById('statKonpo').textContent = todayStats.konpo;
+
+  // KPI進捗バー更新
+  const targets = CONFIG.DAILY_KPI || { bunka: 58, shuppin: 53, konpo: 16 };
+  // HTMLの目標数値も更新
+  const tBunka = document.getElementById('kpiTargetBunka');
+  const tShuppin = document.getElementById('kpiTargetShuppin');
+  const tKonpo = document.getElementById('kpiTargetKonpo');
+  if (tBunka) tBunka.textContent = targets.bunka;
+  if (tShuppin) tShuppin.textContent = targets.shuppin;
+  if (tKonpo) tKonpo.textContent = targets.konpo;
+  const updateBar = (id, current, target) => {
+    const bar = document.getElementById(id);
+    if (!bar) return;
+    const pct = Math.min(100, (current / target) * 100);
+    bar.style.width = pct + '%';
+    if (pct >= 100) bar.classList.add('over');
+    else bar.classList.remove('over');
+  };
+  updateBar('kpiBarBunka', todayStats.bunka, targets.bunka);
+  updateBar('kpiBarShuppin', todayStats.shuppin, targets.shuppin);
+  updateBar('kpiBarKonpo', todayStats.konpo, targets.konpo);
 
   // 実績を日別にローカル保存（目標設定用データ蓄積）
   const statsKey = 'f8_daily_stats_' + today;
