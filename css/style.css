@@ -991,6 +991,19 @@ body[data-theme="female"] {
   font-weight: 600; margin: 2px 2px;
 }
 
+/* 休み連絡 要約（折りたたみ時） */
+.leave-summary {
+  margin-top: 8px;
+}
+.leave-summary-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: var(--card); border-radius: 8px;
+  margin-bottom: 4px; box-shadow: 0 1px 2px var(--shadow);
+  font-size: 13px; color: var(--text);
+}
+.leave-summary-empty {
+  font-size: 12px; color: var(--sub); padding: 4px 0;
+}
 .leave-reason-chips { display: flex; gap: 6px; margin-bottom: 6px; }
 
 /* 管理者：休み管理 */

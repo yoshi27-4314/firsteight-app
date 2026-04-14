@@ -2432,9 +2432,16 @@ function toggleSection(id) {
     if (id === 'changelogSection') {
       markChangelogRead();
     }
+    if (id === 'leaveFormSection') {
+      renderLeaveCalendar();
+      renderLeaveSummary();
+    }
   } else {
     el.style.display = 'none';
     if (arrow) arrow.classList.remove('open');
+    if (id === 'leaveFormSection') {
+      renderLeaveSummary();
+    }
   }
 }
 
@@ -2844,6 +2851,46 @@ function getAllLeaveRequests() {
   return JSON.parse(localStorage.getItem('f8_leave_requests') || '[]');
 }
 
+function renderLeaveSummary() {
+  const container = document.getElementById('leaveSummary');
+  if (!container) return;
+
+  // フォームが開いている時は要約を隠す
+  const form = document.getElementById('leaveFormSection');
+  if (form && form.style.display !== 'none') {
+    container.innerHTML = '';
+    return;
+  }
+
+  const requests = getAllLeaveRequests();
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // 自分の今日以降の予定
+  const mine = requests
+    .filter(r => r.staffName === currentUser?.name && r.date >= todayStr)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(0, 3);
+
+  if (mine.length === 0) {
+    container.innerHTML = '<p class="leave-summary-empty">予定された休みはありません</p>';
+  } else {
+    container.innerHTML = mine.map(r => {
+      const status = r.approved
+        ? '<span class="leave-status leave-status-approved">承諾</span>'
+        : '<span class="leave-status leave-status-pending">未承諾</span>';
+      const timeInfo = r.time ? `（${r.time}）` : '';
+      return `
+        <div class="leave-summary-item">
+          <span class="leave-badge leave-badge-${r.type}">${r.type}</span>
+          <span style="flex:1">${r.date}${timeInfo}</span>
+          ${status}
+        </div>
+      `;
+    }).join('');
+  }
+}
+
 function renderLeaveHistory() {
   // スタッフ用：自分の申告リスト
   const container = document.getElementById('leaveMyList');
@@ -2870,6 +2917,9 @@ function renderLeaveHistory() {
         `;
       }).join('');
   }
+
+  // 要約表示
+  renderLeaveSummary();
 
   // 管理者用
   const adminSection = document.getElementById('leaveAdminSection');
