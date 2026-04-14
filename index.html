@@ -6,7 +6,7 @@
 <title>テイクバック 流通事業部</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C2541">
-<link rel="stylesheet" href="css/style.css?v=20260415x">
+<link rel="stylesheet" href="css/style.css?v=20260415y">
 <script src="https://unpkg.com/@zxing/browser@0.1.4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -972,7 +972,7 @@
         </div>
       </div>
       <!-- 出退勤（朝一番に使う） -->
-      <div class="section">
+      <div class="section" id="attendanceSection">
         <h3 class="section-title">🕐 出退勤</h3>
         <div id="attendanceStatus" class="attendance-card">
           <p id="attendanceMsg" class="attendance-msg">本日の勤務を記録してください</p>
@@ -1060,8 +1060,9 @@
 
         <!-- 管理者用：全員の休み管理 -->
         <div id="leaveAdminSection" style="display:none; margin-top:16px;">
+          <h3 class="section-title collapsible" onclick="toggleSection('leaveAdminBody')">👥 全員の休み管理 <span id="leaveAdminBodyArrow" class="collapse-arrow">▼</span></h3>
+          <div id="leaveAdminBody" class="collapsible-body" style="display:none">
           <div class="leave-admin-header">
-            <h4 style="font-size:14px; color:var(--text); font-weight:700;">👥 全員の休み管理</h4>
             <div class="leave-admin-controls">
               <div class="leave-view-toggle">
                 <button class="leave-toggle-btn active" id="leaveGroupDate" onclick="setLeaveGroup('date')">日付別</button>
@@ -1074,6 +1075,7 @@
             </div>
           </div>
           <div id="leaveAdminContent"></div>
+          </div>
         </div>
       </div>
 
@@ -1138,7 +1140,8 @@
 
       <!-- 管理者用: 権限設定（浅野のみ表示） -->
       <div id="adminPermSection" class="section" style="display:none">
-        <h3 class="section-title">🔐 権限設定</h3>
+        <h3 class="section-title collapsible" onclick="toggleSection('permBody')">🔐 権限設定 <span id="permBodyArrow" class="collapse-arrow">▼</span></h3>
+        <div id="permBody" class="collapsible-body" style="display:none">
         <div class="perm-group">
           <h4 style="font-size:14px; color:var(--gold); margin-bottom:8px;">📱 バーコード登録（本）</h4>
           <p style="font-size:12px; color:var(--sub); margin-bottom:8px;">チェックしたスタッフがバーコード機能を使えます</p>
@@ -1146,6 +1149,7 @@
             <!-- JSで動的に生成 -->
           </div>
           <button class="btn btn-primary" onclick="savePermissionSettings()" style="margin-top:12px; font-size:14px;">💾 権限を保存</button>
+        </div>
         </div>
       </div>
 
@@ -1182,7 +1186,7 @@
 
 </div>
 
-<script src="js/config.js?v=20260415x"></script>
-<script src="js/app.js?v=20260415x"></script>
+<script src="js/config.js?v=20260415y"></script>
+<script src="js/app.js?v=20260415y"></script>
 </body>
 </html>
