@@ -949,6 +949,48 @@ body[data-theme="female"] {
   border-color: var(--gold); background: var(--gold); color: #0B1426;
 }
 .leave-type-btn:active { opacity: 0.7; }
+/* 休み希望カレンダー */
+.leave-cal-header {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; margin-bottom: 8px;
+}
+.leave-cal-nav {
+  background: none; border: none; font-size: 22px; color: var(--gold);
+  cursor: pointer; padding: 4px 10px; font-weight: 700;
+}
+.leave-cal-title { font-size: 15px; font-weight: 700; color: var(--text); min-width: 120px; text-align: center; }
+.leave-cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+}
+.leave-cal-dow {
+  text-align: center; font-size: 11px; color: var(--sub); font-weight: 600;
+  padding: 4px 0;
+}
+.leave-cal-dow:first-child { color: #FF3B30; }
+.leave-cal-dow:last-child { color: #007AFF; }
+.leave-cal-day {
+  text-align: center; padding: 8px 0; border-radius: 8px;
+  font-size: 13px; color: var(--text); cursor: pointer;
+  background: var(--card); border: 2px solid transparent;
+  transition: all 0.12s;
+}
+.leave-cal-day:active { opacity: 0.7; }
+.leave-cal-day.selected {
+  background: var(--gold); color: #0B1426; font-weight: 700;
+  border-color: var(--gold);
+}
+.leave-cal-day.today { border-color: var(--accent); }
+.leave-cal-day.past { opacity: 0.3; pointer-events: none; }
+.leave-cal-day.empty { background: transparent; pointer-events: none; }
+.leave-selected-dates {
+  margin-top: 8px; font-size: 12px; color: var(--sub); min-height: 20px;
+}
+.leave-selected-dates .leave-date-tag {
+  display: inline-block; background: var(--gold); color: #0B1426;
+  padding: 2px 8px; border-radius: 8px; font-size: 11px;
+  font-weight: 600; margin: 2px 2px;
+}
+
 .leave-history-item {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; background: var(--card); border-radius: 10px;

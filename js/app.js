@@ -118,11 +118,7 @@ function showMainScreen() {
   renderFeatureGuide();
   renderChangelog();
   renderLeaveHistory();
-  // 休み希望のデフォルト日付を明日に
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const leaveDate = document.getElementById('leaveDate');
-  if (leaveDate) leaveDate.value = tomorrow.toISOString().slice(0, 10);
+  renderLeaveCalendar();
   const savedTab = localStorage.getItem('f8_current_tab');
   if (savedTab) switchTab(savedTab);
 }
@@ -2696,6 +2692,9 @@ function submitSales() {
 
 // ====== 休み希望・連絡 ======
 let selectedLeaveType = '';
+let selectedLeaveDates = [];
+let leaveCalYear = new Date().getFullYear();
+let leaveCalMonth = new Date().getMonth();
 
 function selectLeaveType(type, btn) {
   selectedLeaveType = type;
@@ -2715,49 +2714,121 @@ function selectLeaveType(type, btn) {
   }
 }
 
+function renderLeaveCalendar() {
+  const grid = document.getElementById('leaveCalGrid');
+  const title = document.getElementById('leaveCalMonth');
+  if (!grid || !title) return;
+
+  title.textContent = `${leaveCalYear}年${leaveCalMonth + 1}月`;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const firstDay = new Date(leaveCalYear, leaveCalMonth, 1);
+  const lastDay = new Date(leaveCalYear, leaveCalMonth + 1, 0);
+  const startDow = firstDay.getDay(); // 0=日
+
+  const dows = ['日','月','火','水','木','金','土'];
+  let html = dows.map(d => `<div class="leave-cal-dow">${d}</div>`).join('');
+
+  // 空白セル
+  for (let i = 0; i < startDow; i++) {
+    html += '<div class="leave-cal-day empty"></div>';
+  }
+
+  // 日付セル
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const dateStr = `${leaveCalYear}-${String(leaveCalMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === today;
+    const isPast = dateStr < today;
+    const isSelected = selectedLeaveDates.includes(dateStr);
+    const cls = [
+      'leave-cal-day',
+      isToday ? 'today' : '',
+      isPast ? 'past' : '',
+      isSelected ? 'selected' : '',
+    ].filter(Boolean).join(' ');
+    html += `<div class="${cls}" onclick="toggleLeaveDate('${dateStr}')">${d}</div>`;
+  }
+
+  grid.innerHTML = html;
+  updateLeaveSelectedInfo();
+}
+
+function toggleLeaveDate(dateStr) {
+  const idx = selectedLeaveDates.indexOf(dateStr);
+  if (idx >= 0) {
+    selectedLeaveDates.splice(idx, 1);
+  } else {
+    selectedLeaveDates.push(dateStr);
+    selectedLeaveDates.sort();
+  }
+  renderLeaveCalendar();
+}
+
+function changeLeaveMonth(delta) {
+  leaveCalMonth += delta;
+  if (leaveCalMonth > 11) { leaveCalMonth = 0; leaveCalYear++; }
+  if (leaveCalMonth < 0) { leaveCalMonth = 11; leaveCalYear--; }
+  renderLeaveCalendar();
+}
+
+function updateLeaveSelectedInfo() {
+  const container = document.getElementById('leaveSelectedInfo');
+  if (!container) return;
+  if (selectedLeaveDates.length === 0) {
+    container.innerHTML = '<span>日付をタップして選択</span>';
+  } else {
+    container.innerHTML = selectedLeaveDates.map(d =>
+      `<span class="leave-date-tag">${d}</span>`
+    ).join('');
+  }
+}
+
 function submitLeaveRequest() {
   if (!selectedLeaveType) { showToast('種別を選択してください'); return; }
-  const date = document.getElementById('leaveDate').value;
-  if (!date) { showToast('日付を選択してください'); return; }
+  if (selectedLeaveDates.length === 0) { showToast('日付を選択してください'); return; }
   const reason = document.getElementById('leaveReason').value.trim();
   const time = (selectedLeaveType === '遅刻' || selectedLeaveType === '早退')
     ? document.getElementById('leaveTime').value : null;
 
-  const request = {
-    type: selectedLeaveType,
-    date: date,
-    time: time,
-    reason: reason,
-    staffName: currentUser.name,
-    submittedAt: new Date().toISOString(),
-  };
-
-  // ローカル保存
   const key = 'f8_leave_requests';
   const requests = JSON.parse(localStorage.getItem(key) || '[]');
-  requests.unshift(request);
+
+  // 各日付分を登録
+  selectedLeaveDates.forEach(date => {
+    const request = {
+      type: selectedLeaveType,
+      date: date,
+      time: time,
+      reason: reason,
+      staffName: currentUser.name,
+      submittedAt: new Date().toISOString(),
+    };
+    requests.unshift(request);
+  });
+
   localStorage.setItem(key, JSON.stringify(requests));
 
   // GASに送信（浅野に通知）
   sendToGAS({
     action: 'leave_request',
     type: selectedLeaveType,
-    date: date,
+    dates: selectedLeaveDates.join(', '),
     time: time || '',
     reason: reason,
     staff: currentUser.name,
     timestamp: formatTimestamp(),
   });
 
-  showToast(`${selectedLeaveType}の連絡を送信しました`);
+  const count = selectedLeaveDates.length;
+  showToast(`${selectedLeaveType}の連絡を送信しました（${count}日分）`);
 
   // フォームリセット
   selectedLeaveType = '';
+  selectedLeaveDates = [];
   document.querySelectorAll('.leave-type-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('leaveDate').value = '';
   document.getElementById('leaveReason').value = '';
   document.getElementById('leaveTimeSection').style.display = 'none';
-
+  renderLeaveCalendar();
   renderLeaveHistory();
 }
 

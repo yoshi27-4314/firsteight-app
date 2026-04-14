@@ -774,14 +774,6 @@
             </div>
             <span class="gchat-arrow">›</span>
           </a>
-          <a href="https://chat.google.com/room/AAAAlCmrSsM?cls=7" target="_blank" class="gchat-link">
-            <span class="gchat-icon">🕐</span>
-            <div class="gchat-info">
-              <span class="gchat-name">勤怠連絡</span>
-              <span class="gchat-desc">休み希望・勤怠の連絡</span>
-            </div>
-            <span class="gchat-arrow">›</span>
-          </a>
           <a href="https://chat.google.com/room/AAAAsJtX7rs?cls=7" target="_blank" class="gchat-link">
             <span class="gchat-icon">📢</span>
             <div class="gchat-info">
@@ -948,8 +940,14 @@
             </div>
           </div>
           <div class="form-group">
-            <label>日付</label>
-            <input type="date" id="leaveDate" class="search-input" style="width:100%">
+            <label>日付（複数選択OK）</label>
+            <div class="leave-cal-header">
+              <button class="leave-cal-nav" onclick="changeLeaveMonth(-1)">‹</button>
+              <span id="leaveCalMonth" class="leave-cal-title"></span>
+              <button class="leave-cal-nav" onclick="changeLeaveMonth(1)">›</button>
+            </div>
+            <div class="leave-cal-grid" id="leaveCalGrid"></div>
+            <div class="leave-selected-dates" id="leaveSelectedInfo"></div>
           </div>
           <div id="leaveTimeSection" style="display:none">
             <div class="form-group">
