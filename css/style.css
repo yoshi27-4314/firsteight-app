@@ -816,68 +816,72 @@ body[data-theme="female"] {
 .perm-row {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px; cursor: pointer;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: var(--card); border-radius: 10px; margin-bottom: 6px;
+  box-shadow: 0 1px 3px var(--shadow);
 }
-.perm-row:active { background: rgba(255,255,255,0.04); }
+.perm-row:active { opacity: 0.8; }
 .perm-cb {
   width: 22px; height: 22px; accent-color: var(--gold); flex-shrink: 0;
 }
 .perm-name {
-  font-size: 15px; color: #fff; flex: 1;
+  font-size: 15px; color: var(--text); font-weight: 500; flex: 1;
 }
 .perm-role {
-  font-size: 12px; color: #8892A4;
+  font-size: 12px; color: var(--sub); font-weight: 500;
 }
 
 /* 機能ガイド */
 .guide-card {
-  background: rgba(255,255,255,0.06); border-radius: 12px; padding: 16px;
-  margin-bottom: 8px;
+  background: var(--card); border-radius: 12px; padding: 16px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px var(--shadow);
 }
 .guide-card-header {
   display: flex; align-items: center; gap: 10px;
-  font-size: 15px; font-weight: 700; color: #fff;
+  font-size: 15px; font-weight: 700; color: var(--text);
   margin-bottom: 10px;
 }
 .guide-card-header .guide-icon { font-size: 22px; }
 .guide-steps { padding-left: 4px; }
 .guide-step {
   display: flex; align-items: flex-start; gap: 10px;
-  font-size: 13px; color: #C8D0DC; margin-bottom: 8px; line-height: 1.5;
+  font-size: 13px; color: var(--text); margin-bottom: 8px; line-height: 1.6;
 }
 .guide-step-num {
-  background: var(--gold); color: #0B1426;
+  background: var(--gold); color: #fff;
   width: 20px; height: 20px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
 }
 .guide-note {
   font-size: 12px; color: var(--danger); margin-top: 6px; padding-left: 30px;
-  opacity: 0.8;
 }
 
 /* 更新履歴 */
-.changelog-entry { margin-bottom: 16px; }
+.changelog-entry {
+  margin-bottom: 16px; background: var(--card); border-radius: 12px;
+  padding: 14px 16px; box-shadow: 0 1px 3px var(--shadow);
+}
 .changelog-date {
-  font-size: 13px; color: var(--gold); font-weight: 700;
-  margin-bottom: 8px; letter-spacing: 1px;
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 .changelog-item {
   display: flex; align-items: flex-start; gap: 8px;
-  font-size: 13px; color: #C8D0DC; margin-bottom: 6px; line-height: 1.5;
+  font-size: 13px; color: var(--text); margin-bottom: 8px; line-height: 1.5;
 }
 .changelog-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 6px;
-  font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+  display: inline-block; padding: 3px 8px; border-radius: 6px;
+  font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
   letter-spacing: 0.5px;
 }
-.changelog-badge-new { background: var(--gold); color: #0B1426; }
-.changelog-badge-change { background: #3A7BD5; color: #fff; }
-.changelog-badge-fix { background: var(--accent); color: #fff; }
-.changelog-badge-init { background: #5a6272; color: #fff; }
+.changelog-badge-new { background: #34C759; color: #fff; }
+.changelog-badge-change { background: #007AFF; color: #fff; }
+.changelog-badge-fix { background: #FF9500; color: #fff; }
+.changelog-badge-init { background: #8E8E93; color: #fff; }
 
 /* ホーム通知: 更新通知 */
-.notice-badge.notice-update { background: #3A7BD5; }
+.notice-badge.notice-update { background: #007AFF; }
 
 /* メンション モーダル式 */
 .chat-mention-bar {
