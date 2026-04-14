@@ -244,19 +244,19 @@ function renderTodayDuty() {
 }
 
 // ====== AI判定中オーバーレイ ======
-function showAnalyzingOverlay() {
+function showAnalyzingOverlay(title, subtitle) {
   let overlay = document.getElementById('analyzingOverlay');
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'analyzingOverlay';
     overlay.className = 'analyzing-overlay';
-    overlay.innerHTML = `
-      <div class="analyzing-spinner"></div>
-      <div class="analyzing-text">🤖 AIが判定中<span class="analyzing-dots"></span></div>
-      <div class="analyzing-sub">写真を分析しています</div>
-    `;
     document.body.appendChild(overlay);
   }
+  overlay.innerHTML = `
+    <div class="analyzing-spinner"></div>
+    <div class="analyzing-text">${title || '🤖 AIが判定中'}<span class="analyzing-dots"></span></div>
+    <div class="analyzing-sub">${subtitle || '写真を分析しています'}</div>
+  `;
   overlay.style.display = 'flex';
 }
 
@@ -2547,7 +2547,7 @@ async function searchStock() {
   const q = document.getElementById('stockSearch').value.trim();
   if (!q) return;
 
-  showToast('🔍 検索中...');
+  showAnalyzingOverlay('🔍 検索中', '14,000件以上のデータを検索しています');
 
   // ローカルデータから検索
   const localItems = getItems();
@@ -2598,6 +2598,7 @@ async function searchStock() {
     console.log('スプレッドシート検索エラー:', e);
   }
 
+  hideAnalyzingOverlay();
   if (results.length === 0) {
     showToast('「' + q + '」は見つかりませんでした');
   } else {
