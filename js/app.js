@@ -1123,9 +1123,40 @@ async function sendToGAS(payload) {
 }
 
 // ====== チャット ======
+let selectedMentions = [];
+
 function getSelectedMentions() {
-  const checkboxes = document.querySelectorAll('#mentionChips input[type="checkbox"]:checked');
-  return Array.from(checkboxes).map(cb => cb.value);
+  return selectedMentions;
+}
+
+function openMentionModal() {
+  // 現在の選択状態をチェックボックスに反映
+  document.querySelectorAll('.mention-cb').forEach(cb => {
+    cb.checked = selectedMentions.includes(cb.value);
+  });
+  document.getElementById('mentionOverlay').style.display = 'flex';
+}
+
+function closeMentionModal() {
+  document.getElementById('mentionOverlay').style.display = 'none';
+}
+
+function applyMentions() {
+  const checkboxes = document.querySelectorAll('.mention-cb:checked');
+  selectedMentions = Array.from(checkboxes).map(cb => cb.value);
+  updateMentionTags();
+  closeMentionModal();
+}
+
+function updateMentionTags() {
+  const container = document.getElementById('mentionSelectedTags');
+  if (selectedMentions.length === 0) {
+    container.innerHTML = '<span style="color:var(--sub)">未選択</span>';
+  } else {
+    container.innerHTML = selectedMentions.map(m =>
+      `<span class="mention-tag">@${m}</span>`
+    ).join('');
+  }
 }
 
 function sendChat() {
@@ -1161,7 +1192,8 @@ function sendChat() {
   }
 
   // メンション選択をリセット
-  document.querySelectorAll('#mentionChips input[type="checkbox"]').forEach(cb => cb.checked = false);
+  selectedMentions = [];
+  updateMentionTags();
 }
 
 async function chatWithAI(msg) {

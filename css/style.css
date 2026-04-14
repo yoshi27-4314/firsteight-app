@@ -875,25 +875,37 @@ body[data-theme="female"] {
 /* ホーム通知: 更新通知 */
 .notice-badge.notice-update { background: #3A7BD5; }
 
-/* メンション チップ式 */
-.mention-chips {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  margin-bottom: 8px;
+/* メンション モーダル式 */
+.chat-mention-bar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
 }
-.mention-chip {
-  cursor: pointer; user-select: none;
+.mention-open-btn {
+  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--gold);
+  background: transparent; color: var(--gold); font-size: 13px;
+  font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0;
 }
-.mention-chip input[type="checkbox"] {
-  display: none;
+.mention-open-btn:active { background: var(--gold); color: #0B1426; }
+.mention-selected {
+  font-size: 13px; color: var(--sub); overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
 }
-.mention-chip span {
-  display: inline-block; padding: 6px 12px;
-  border-radius: 20px; font-size: 13px; font-weight: 500;
-  background: #1C2541; color: #8892A4;
-  border: 1px solid #2A3553;
-  transition: all 0.15s;
+.mention-selected .mention-tag {
+  display: inline-block; background: var(--gold); color: #0B1426;
+  padding: 2px 8px; border-radius: 10px; font-size: 11px;
+  font-weight: 700; margin-right: 4px;
 }
-.mention-chip input:checked + span {
-  background: var(--gold); color: #0B1426;
-  border-color: var(--gold); font-weight: 700;
+.mention-modal { max-width: 340px; }
+.mention-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #1a2035;
+}
+.mention-row:active { background: #2A3553; }
+.mention-cb {
+  width: 20px; height: 20px; accent-color: var(--gold); flex-shrink: 0;
+}
+.mention-avatar { font-size: 22px; flex-shrink: 0; }
+.mention-name { font-size: 14px; color: var(--text); flex: 1; }
+.mention-role { font-size: 11px; color: var(--sub); }
+.mention-divider {
+  height: 1px; background: #2A3553; margin: 4px 16px;
 }

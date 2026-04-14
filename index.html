@@ -677,25 +677,81 @@
           </div>
         </div>
         <div class="chat-input-area">
-          <div class="chat-mention-row">
-            <label style="font-size:12px; color:var(--sub);">宛先（複数選択OK）</label>
-          </div>
-          <div class="mention-chips" id="mentionChips">
-            <label class="mention-chip"><input type="checkbox" value="AI"><span>🤖 AI</span></label>
-            <label class="mention-chip"><input type="checkbox" value="浅野儀頼"><span>浅野</span></label>
-            <label class="mention-chip"><input type="checkbox" value="全員"><span>📢 全員</span></label>
-            <label class="mention-chip"><input type="checkbox" value="林和人"><span>林</span></label>
-            <label class="mention-chip"><input type="checkbox" value="横山優"><span>横山</span></label>
-            <label class="mention-chip"><input type="checkbox" value="平野光雄"><span>平野</span></label>
-            <label class="mention-chip"><input type="checkbox" value="三島圭織"><span>三島</span></label>
-            <label class="mention-chip"><input type="checkbox" value="桃井侑菜"><span>桃井</span></label>
-            <label class="mention-chip"><input type="checkbox" value="伊藤佐和子"><span>伊藤</span></label>
-            <label class="mention-chip"><input type="checkbox" value="奥村亜優李"><span>奥村</span></label>
+          <div class="chat-mention-bar">
+            <button class="mention-open-btn" onclick="openMentionModal()">@ 宛先を選ぶ</button>
+            <div class="mention-selected" id="mentionSelectedTags">未選択</div>
           </div>
           <div class="chat-input-row">
             <input type="text" id="chatInput" placeholder="メッセージを入力..." class="chat-input">
             <button class="chat-send-btn" onclick="sendChat()">送信</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- メンション選択モーダル -->
+    <div id="mentionOverlay" class="modal-overlay" onclick="closeMentionModal()">
+      <div class="modal mention-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 style="color:var(--text)">@ 宛先を選択</h3>
+          <button class="modal-close" onclick="closeMentionModal()">✕</button>
+        </div>
+        <div class="modal-body" style="padding:8px 0">
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="AI" class="mention-cb">
+            <span class="mention-avatar">🤖</span>
+            <span class="mention-name">AIアシスタント</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="浅野儀頼" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">浅野儀頼</span>
+            <span class="mention-role">管理者</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="全員" class="mention-cb">
+            <span class="mention-avatar">📢</span>
+            <span class="mention-name">全員</span>
+          </label>
+          <div class="mention-divider"></div>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="林和人" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">林和人</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="横山優" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">横山優</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="平野光雄" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">平野光雄</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="三島圭織" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">三島圭織</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="桃井侑菜" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">桃井侑菜</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="伊藤佐和子" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">伊藤佐和子</span>
+          </label>
+          <label class="mention-row" onclick="event.stopPropagation()">
+            <input type="checkbox" value="奥村亜優李" class="mention-cb">
+            <span class="mention-avatar">👤</span>
+            <span class="mention-name">奥村亜優李</span>
+          </label>
+        </div>
+        <div style="padding:12px 16px">
+          <button class="btn btn-primary" onclick="applyMentions()" style="width:100%">決定</button>
         </div>
       </div>
     </div>
