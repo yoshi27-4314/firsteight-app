@@ -850,19 +850,45 @@ async function startBarcodeScanner() {
       console.log('デバイス一覧取得エラー:', devErr);
     }
 
-    codeReader.decodeFromVideoDevice(backCameraId, videoEl, (result, err) => {
+    // カメラの解像度を高めに設定（バーコード読み取り精度向上）
+    const constraints = {
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        focusMode: { ideal: 'continuous' },
+      }
+    };
+
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    videoEl.srcObject = stream;
+    videoEl.play();
+
+    codeReader.decodeFromVideoElement(videoEl, (result, err) => {
       if (result) {
         const isbn = result.getText();
         console.log('Barcode detected:', isbn);
+        // ストリームを停止
+        stream.getTracks().forEach(t => t.stop());
         stopBarcode();
         handleBarcodeResult(isbn);
       }
     });
-    showToast('📱 バーコードにカメラを向けてください');
+    showToast('📱 バーコードに近づけてピントを合わせてください');
   } catch (err) {
     console.error('Barcode scanner error:', err);
     showToast('カメラを起動できませんでした: ' + err.message);
   }
+}
+
+function handleManualISBN() {
+  const isbn = document.getElementById('manualISBN').value.trim().replace(/-/g, '');
+  if (!isbn || isbn.length < 10) {
+    showToast('ISBNを入力してください（10桁または13桁）');
+    return;
+  }
+  stopBarcode();
+  handleBarcodeResult(isbn);
 }
 
 function stopBarcode() {
