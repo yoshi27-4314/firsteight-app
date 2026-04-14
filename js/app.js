@@ -182,6 +182,47 @@ setInterval(() => {
   }
 }, 5000);
 
+// ====== 今日の当番表示 ======
+function renderTodayDuty() {
+  const container = document.getElementById('dutyCards');
+  if (!container) return;
+
+  const dow = new Date().getDay(); // 0=日〜6=土
+  const shuppinStaff = CONFIG.SHUPPIN_ROTATION[dow] || '—';
+  const konpoStaff = CONFIG.KONPO_STAFF || '—';
+  const torihikiStaff = CONFIG.TORIHIKI_NAVI || '—';
+
+  // 土日は当番なし
+  if (dow === 0 || dow === 6) {
+    container.innerHTML = '';
+    return;
+  }
+
+  // 自分が当番かどうかハイライト
+  const myName = currentUser?.name || '';
+  const isMyShuppin = myName === shuppinStaff;
+  const isMyKonpo = myName === konpoStaff;
+  const isMyTorihiki = myName === torihikiStaff;
+
+  container.innerHTML = `
+    <div class="duty-card ${isMyShuppin ? 'duty-mine' : ''}">
+      <span class="duty-icon">📝</span>
+      <span class="duty-label">出品</span>
+      <span class="duty-name">${escapeHtml(shuppinStaff.split(/[　 ]/)[0])}</span>
+    </div>
+    <div class="duty-card ${isMyTorihiki ? 'duty-mine' : ''}">
+      <span class="duty-icon">💬</span>
+      <span class="duty-label">取引ナビ</span>
+      <span class="duty-name">${escapeHtml(torihikiStaff.split(/[　 ]/)[0])}</span>
+    </div>
+    <div class="duty-card ${isMyKonpo ? 'duty-mine' : ''}">
+      <span class="duty-icon">📦</span>
+      <span class="duty-label">梱包</span>
+      <span class="duty-name">${escapeHtml(konpoStaff.split(/[　 ]/)[0])}</span>
+    </div>
+  `;
+}
+
 // ====== AI判定中オーバーレイ ======
 function showAnalyzingOverlay() {
   let overlay = document.getElementById('analyzingOverlay');
@@ -424,6 +465,9 @@ function updateHomeStats() {
 
   // お知らせ更新
   updateNoticeList(items);
+
+  // 今日の当番表示
+  renderTodayDuty();
 
   // 挨拶の更新
   const greetEl = document.querySelector('.greeting h2');

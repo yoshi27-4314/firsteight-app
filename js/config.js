@@ -52,8 +52,23 @@ const CONFIG = {
     return String(now.getFullYear()).slice(2) + String(now.getMonth() + 1).padStart(2, '0');
   },
 
+  // 出品当番ローテーション（曜日: 0=日〜6=土）
+  SHUPPIN_ROTATION: {
+    1: '奥村亜優李',  // 月
+    2: '横山優',      // 火
+    3: '林和人',      // 水
+    4: '奥村亜優李',  // 木
+    5: '横山優',      // 金
+  },
+
+  // 取引ナビ担当
+  TORIHIKI_NAVI: '奥村亜優李',
+
+  // 梱包担当（固定）
+  KONPO_STAFF: '桃井侑菜',
+
   // アプリバージョン
-  APP_VERSION: '2026.04.14',
+  APP_VERSION: '2026.04.15',
 
   // 更新履歴（新しい順。機能追加・変更時にここに追記する）
   // notify: true → ホームのお知らせに表示
