@@ -50,7 +50,7 @@ const CONFIG = {
     { name: '平野光雄', role: 'staff', start: '09:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み', company: 'クリアメンテ' },
     { name: '松本豊彦', role: 'staff', start: '09:00', end: '16:00', breakMin: 60, offDays: [], pattern: '週5日', company: 'クリアメンテ' },
     { name: '北瀬孝', role: 'staff', start: '09:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み', company: 'クリアメンテ' },
-    { name: '三島圭織', role: 'staff', start: '10:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み' },
+    { name: '三島圭織', role: 'staff', start: '10:00', end: '16:00', breakMin: 60, offDays: [3], pattern: '水休み', company: 'クリアメンテ', showTimeline: false },
   ],
 
   // 管理番号フォーマット
