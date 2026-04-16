@@ -34,7 +34,6 @@
   --radius-sm: 10px;
   --shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
-
 body {
   font-family: 'Noto Sans JP', sans-serif;
   background: var(--bg);
@@ -67,6 +66,11 @@ body {
   width: 16px; height: 16px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
+.notif-badge.hidden { display: none; }
+
+/* ===== TAB VIEWS ===== */
+.tab-view { display: none; }
+.tab-view.active { display: block; }
 
 /* ===== GREETING ===== */
 .greeting-section { padding: 20px 16px 0; }
@@ -82,6 +86,10 @@ body {
   letter-spacing: 2px; text-transform: uppercase;
   margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
 }
+.section-title .count-badge {
+  background: var(--danger); color: #fff; font-size: 10px; font-weight: 700;
+  padding: 1px 7px; border-radius: 10px; letter-spacing: 0;
+}
 
 /* ===== ALERT BANNER ===== */
 .alert-banner {
@@ -89,11 +97,11 @@ body {
   background: var(--danger-dim);
   border: 1px solid rgba(206,32,41,0.3);
   border-radius: var(--radius-sm);
-  display: flex; align-items: center; gap: 10px;
+  display: none; align-items: center; gap: 10px;
   font-size: 13px; color: #ff8a8a;
   cursor: pointer;
 }
-.alert-banner:empty { display: none; }
+.alert-banner.show { display: flex; }
 .alert-pulse {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--danger);
@@ -106,14 +114,10 @@ body {
 }
 
 /* ===== KPI GRID ===== */
-.kpi-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-}
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px; text-align: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; text-align: center;
 }
 .kpi-value { font-size: 24px; font-weight: 700; color: var(--gold); }
 .kpi-label { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
@@ -125,13 +129,10 @@ body {
 /* ===== BUSINESS UNIT CARDS ===== */
 .biz-list { display: flex; flex-direction: column; gap: 10px; }
 .biz-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
   display: flex; align-items: center; gap: 14px;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.1s;
+  cursor: pointer; transition: border-color 0.2s, transform 0.1s;
 }
 .biz-card:active { transform: scale(0.98); }
 .biz-card:hover { border-color: var(--gold); }
@@ -156,17 +157,13 @@ body {
 /* ===== APPROVAL LIST ===== */
 .approval-list { display: flex; flex-direction: column; gap: 8px; }
 .approval-card {
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  border-left: 3px solid var(--danger);
-  display: flex; align-items: center; gap: 12px;
-  cursor: pointer;
+  background: var(--surface); border-radius: var(--radius-sm);
+  padding: 14px 16px; border-left: 3px solid var(--danger);
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
 }
 .approval-card:active { opacity: 0.8; }
 .approval-badge {
-  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 6px;
-  white-space: nowrap;
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 6px; white-space: nowrap;
 }
 .badge-urgent { background: var(--danger-dim); color: #ff6b6b; }
 .badge-normal { background: var(--gold-dim); color: var(--gold); }
@@ -175,6 +172,44 @@ body {
 .approval-title { font-size: 13px; color: var(--text); }
 .approval-meta { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
 .approval-action { color: var(--gold); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+
+/* ===== STAFF STATUS ===== */
+.staff-grid { display: flex; flex-direction: column; gap: 6px; }
+.staff-row {
+  background: var(--surface); border-radius: var(--radius-sm);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+}
+.staff-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.avatar-working { background: var(--success-dim); color: var(--success); border: 2px solid var(--success); }
+.avatar-off { background: var(--surface2); color: var(--text-dim); border: 2px solid var(--border); }
+.avatar-late { background: var(--yellow-dim); color: #b89a20; border: 2px solid var(--yellow); }
+.avatar-leave { background: var(--danger-dim); color: #ff6b6b; border: 2px solid rgba(206,32,41,0.4); }
+.staff-info { flex: 1; }
+.staff-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.staff-detail { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+.staff-status-tag {
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 6px; flex-shrink: 0;
+}
+.tag-working { background: var(--success-dim); color: var(--success); }
+.tag-off { background: var(--surface2); color: var(--text-dim); }
+.tag-absent { background: var(--danger-dim); color: #ff6b6b; }
+.tag-late { background: var(--yellow-dim); color: #b89a20; }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.quick-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 8px; text-align: center;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.quick-btn:hover { border-color: var(--gold); }
+.quick-btn:active { transform: scale(0.96); }
+.quick-icon { font-size: 24px; margin-bottom: 6px; }
+.quick-label { font-size: 11px; color: var(--text-sub); font-weight: 500; }
 
 /* ===== TIMELINE ===== */
 .timeline { display: flex; flex-direction: column; gap: 0; }
@@ -196,21 +231,57 @@ body {
 .timeline-text { font-size: 13px; color: var(--text); }
 .timeline-source { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
 
-/* ===== QUICK ACTIONS ===== */
-.quick-actions {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85); z-index: 200;
+  display: none; align-items: flex-end; justify-content: center;
 }
-.quick-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 8px; text-align: center;
-  cursor: pointer; transition: border-color 0.2s;
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 20px 20px 0 0;
+  width: 100%; max-width: 480px; max-height: 85vh;
+  overflow-y: auto; padding: 24px 20px 40px;
 }
-.quick-btn:hover { border-color: var(--gold); }
-.quick-btn:active { transform: scale(0.96); }
-.quick-icon { font-size: 24px; margin-bottom: 6px; }
-.quick-label { font-size: 11px; color: var(--text-sub); font-weight: 500; }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-title { font-size: 18px; font-weight: 700; color: var(--white); }
+.modal-close {
+  background: none; border: none; color: var(--text-sub);
+  font-size: 24px; cursor: pointer; padding: 4px;
+}
+.modal-field { margin-bottom: 16px; }
+.modal-label { font-size: 12px; color: var(--text-sub); margin-bottom: 6px; font-weight: 500; }
+.modal-select, .modal-input, .modal-textarea {
+  width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; font-family: inherit;
+}
+.modal-select:focus, .modal-input:focus, .modal-textarea:focus {
+  outline: none; border-color: var(--gold);
+}
+.modal-textarea { min-height: 80px; resize: vertical; }
+.modal-btn {
+  width: 100%; padding: 14px; border: none; border-radius: var(--radius);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit; margin-top: 8px;
+}
+.btn-gold { background: var(--gold); color: #1a1a1a; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-sub);
+}
+.btn-row { display: flex; gap: 10px; margin-top: 8px; }
+.btn-row .modal-btn { flex: 1; }
+
+/* ===== APPROVAL DETAIL ===== */
+.approval-detail-item { margin-bottom: 12px; }
+.approval-detail-label { font-size: 11px; color: var(--text-sub); }
+.approval-detail-value { font-size: 15px; color: var(--white); font-weight: 500; margin-top: 2px; }
+.approval-price { font-size: 22px; color: var(--gold); font-weight: 700; }
 
 /* ===== BOTTOM NAV ===== */
 .bottom-nav {
@@ -230,8 +301,7 @@ body {
 
 /* ===== EMPTY STATE ===== */
 .empty-state {
-  text-align: center; padding: 24px;
-  color: var(--text-dim); font-size: 13px;
+  text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;
 }
 .empty-icon { font-size: 32px; margin-bottom: 8px; }
 
@@ -240,16 +310,9 @@ body {
   body { max-width: 480px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
   .bottom-nav { max-width: 480px; left: 50%; transform: translateX(-50%); }
   .kpi-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
-}
-@media (min-width: 1200px) {
-  body { max-width: 100%; border: none; }
-  .bottom-nav { display: none; }
-  .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 0; max-width: 1200px; margin: 0 auto; }
-  .main-content > .section { padding: 0 20px 20px; }
-  .kpi-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .modal { border-radius: 20px; margin-bottom: 20px; }
 }
 
-/* ===== SCROLL ===== */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -264,55 +327,60 @@ body {
     <span class="header-title">FIRST EIGHT</span>
   </div>
   <div class="header-right">
-    <span class="header-icon">
-      🔔
-      <span class="notif-badge" id="notifCount">3</span>
+    <span class="header-icon" onclick="switchTab('home')">
+      🔔<span class="notif-badge hidden" id="notifCount"></span>
     </span>
     <span class="header-icon">⚙️</span>
   </div>
 </div>
 
-<!-- ALERT BANNER（異常時のみ表示） -->
-<div class="alert-banner" id="alertBanner">
+<!-- ALERT BANNER -->
+<div class="alert-banner" id="alertBanner" onclick="switchTab('approval')">
   <span class="alert-pulse"></span>
-  <span>承認待ちが3件あります — タップして確認</span>
+  <span id="alertText"></span>
 </div>
 
-<!-- GREETING -->
+<!-- ===== TAB: HOME ===== -->
+<div class="tab-view active" id="tab-home">
+
 <div class="greeting-section">
-  <div class="greeting-time" id="greetingTime">GOOD MORNING</div>
+  <div class="greeting-time" id="greetingTime"></div>
   <div class="greeting-name">浅野 儀頼</div>
   <div class="greeting-date" id="greetingDate"></div>
   <div class="gold-line"></div>
 </div>
 
-<div class="main-content">
-
-<!-- KPI OVERVIEW -->
+<!-- KPI -->
 <div class="section">
   <div class="section-title">📊 Monthly Overview</div>
-  <div class="kpi-grid">
+  <div class="kpi-grid" id="kpiGrid">
     <div class="kpi-card">
-      <div class="kpi-value">¥4.2M</div>
+      <div class="kpi-value" id="kpiSales">--</div>
       <div class="kpi-label">売上合計</div>
-      <div class="kpi-change kpi-up">↑ +12%</div>
+      <div class="kpi-change kpi-flat" id="kpiSalesChange">読込中</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-value">¥1.8M</div>
+      <div class="kpi-value" id="kpiProfit">--</div>
       <div class="kpi-label">粗利合計</div>
-      <div class="kpi-change kpi-up">↑ +8%</div>
+      <div class="kpi-change kpi-flat" id="kpiProfitChange">読込中</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-value">348</div>
-      <div class="kpi-label">処理件数</div>
-      <div class="kpi-change kpi-up">↑ +15%</div>
+      <div class="kpi-value" id="kpiCount">--</div>
+      <div class="kpi-label">販売件数</div>
+      <div class="kpi-change kpi-flat" id="kpiCountChange">読込中</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-value">92%</div>
-      <div class="kpi-label">稼働率</div>
-      <div class="kpi-change kpi-flat">— 横ばい</div>
+      <div class="kpi-value" id="kpiInventory">--</div>
+      <div class="kpi-label">在庫点数</div>
+      <div class="kpi-change kpi-flat" id="kpiInvChange">読込中</div>
     </div>
   </div>
+</div>
+
+<!-- STAFF STATUS -->
+<div class="section">
+  <div class="section-title">👥 スタッフ状況</div>
+  <div class="staff-grid" id="staffGrid"></div>
 </div>
 
 <!-- BUSINESS UNITS -->
@@ -321,94 +389,33 @@ body {
   <div class="biz-list">
     <div class="biz-card" onclick="openApp('askara')">
       <div class="biz-icon bi-askara">🚀</div>
-      <div class="biz-info">
-        <div class="biz-name">アスカラ</div>
-        <div class="biz-meta">リード獲得 ・ 営業支援</div>
-      </div>
-      <div class="biz-right">
-        <div class="biz-amount">—</div>
-        <div class="biz-status">準備中</div>
-      </div>
+      <div class="biz-info"><div class="biz-name">アスカラ</div><div class="biz-meta">リード獲得 ・ 営業支援</div></div>
+      <div class="biz-right"><div class="biz-amount">—</div><div class="biz-status">準備中</div></div>
       <span class="biz-arrow">›</span>
     </div>
     <div class="biz-card" onclick="openApp('clearmainte')">
       <div class="biz-icon bi-clear">🏗️</div>
-      <div class="biz-info">
-        <div class="biz-name">クリアメンテ</div>
-        <div class="biz-meta">施工中 5件 ・ 見積中 3件</div>
-      </div>
-      <div class="biz-right">
-        <div class="biz-amount">¥2.1M</div>
-        <div class="biz-status">請求待ち 2件</div>
-      </div>
+      <div class="biz-info"><div class="biz-name">クリアメンテ</div><div class="biz-meta">施工中 5件 ・ 見積中 3件</div></div>
+      <div class="biz-right"><div class="biz-amount">¥2.1M</div><div class="biz-status">請求待ち 2件</div></div>
       <span class="biz-arrow">›</span>
     </div>
     <div class="biz-card" onclick="openApp('saisei')">
       <div class="biz-icon bi-saisei">🔨</div>
-      <div class="biz-info">
-        <div class="biz-name">テイクバック 再生</div>
-        <div class="biz-meta">案件 3件 ・ 作業中 1件</div>
-      </div>
-      <div class="biz-right">
-        <div class="biz-amount">¥0.8M</div>
-        <div class="biz-status">見積2件</div>
-      </div>
+      <div class="biz-info"><div class="biz-name">テイクバック 再生</div><div class="biz-meta">案件 3件 ・ 作業中 1件</div></div>
+      <div class="biz-right"><div class="biz-amount">¥0.8M</div><div class="biz-status">見積2件</div></div>
       <span class="biz-arrow">›</span>
     </div>
     <div class="biz-card" onclick="openApp('takeback')">
       <div class="biz-icon bi-takeback">📦</div>
-      <div class="biz-info">
-        <div class="biz-name">テイクバック 流通</div>
-        <div class="biz-meta">スタッフ8名 ・ 在庫 234点</div>
-      </div>
-      <div class="biz-right">
-        <div class="biz-amount">¥1.2M</div>
-        <div class="biz-status">前月比 +15%</div>
-      </div>
+      <div class="biz-info"><div class="biz-name">テイクバック 流通</div><div class="biz-meta" id="bizTakebackMeta">スタッフ8名</div></div>
+      <div class="biz-right"><div class="biz-amount" id="bizTakebackAmount">--</div><div class="biz-status" id="bizTakebackStatus">読込中</div></div>
       <span class="biz-arrow">›</span>
     </div>
     <div class="biz-card" onclick="openApp('aix')">
       <div class="biz-icon bi-aix">🤖</div>
-      <div class="biz-info">
-        <div class="biz-name">AIトランスフォーメーション事業部</div>
-        <div class="biz-meta">受託開発 ・ 2案件進行中</div>
-      </div>
-      <div class="biz-right">
-        <div class="biz-amount">¥0.9M</div>
-        <div class="biz-status">開発中</div>
-      </div>
+      <div class="biz-info"><div class="biz-name">AIトランスフォーメーション事業部</div><div class="biz-meta">受託開発 ・ 2案件進行中</div></div>
+      <div class="biz-right"><div class="biz-amount">¥0.9M</div><div class="biz-status">開発中</div></div>
       <span class="biz-arrow">›</span>
-    </div>
-  </div>
-</div>
-
-<!-- APPROVALS -->
-<div class="section">
-  <div class="section-title">🔴 承認待ち</div>
-  <div class="approval-list">
-    <div class="approval-card">
-      <span class="approval-badge badge-urgent">高額品</span>
-      <div class="approval-content">
-        <div class="approval-title">2604-0031 真鍮ランプ ¥45,000</div>
-        <div class="approval-meta">テイクバック流通 ・ 桃井さんから ・ 2時間前</div>
-      </div>
-      <span class="approval-action">確認 ›</span>
-    </div>
-    <div class="approval-card">
-      <span class="approval-badge badge-normal">相談</span>
-      <div class="approval-content">
-        <div class="approval-title">アンティーク判定について相談</div>
-        <div class="approval-meta">テイクバック流通 ・ 林さんから ・ 5時間前</div>
-      </div>
-      <span class="approval-action">確認 ›</span>
-    </div>
-    <div class="approval-card">
-      <span class="approval-badge badge-info">見積</span>
-      <div class="approval-content">
-        <div class="approval-title">岐阜市蔵前 片付け ¥185,000</div>
-        <div class="approval-meta">クリアメンテ ・ 提出済み ・ 返答待ち</div>
-      </div>
-      <span class="approval-action">確認 ›</span>
     </div>
   </div>
 </div>
@@ -417,29 +424,23 @@ body {
 <div class="section">
   <div class="section-title">⚡ クイックアクション</div>
   <div class="quick-actions">
-    <div class="quick-btn">
-      <div class="quick-icon">📞</div>
-      <div class="quick-label">代理連絡</div>
+    <div class="quick-btn" onclick="openProxyModal()">
+      <div class="quick-icon">📞</div><div class="quick-label">代理連絡</div>
     </div>
-    <div class="quick-btn">
-      <div class="quick-icon">💰</div>
-      <div class="quick-label">売上確認</div>
+    <div class="quick-btn" onclick="switchTab('sales')">
+      <div class="quick-icon">💰</div><div class="quick-label">売上確認</div>
     </div>
-    <div class="quick-btn">
-      <div class="quick-icon">📊</div>
-      <div class="quick-label">月次レポート</div>
+    <div class="quick-btn" onclick="showToast('準備中です')">
+      <div class="quick-icon">📊</div><div class="quick-label">月次レポート</div>
     </div>
-    <div class="quick-btn">
-      <div class="quick-icon">👥</div>
-      <div class="quick-label">スタッフ状況</div>
+    <div class="quick-btn" onclick="scrollToStaff()">
+      <div class="quick-icon">👥</div><div class="quick-label">スタッフ状況</div>
     </div>
-    <div class="quick-btn">
-      <div class="quick-icon">💬</div>
-      <div class="quick-label">AI相談</div>
+    <div class="quick-btn" onclick="showToast('準備中です')">
+      <div class="quick-icon">💬</div><div class="quick-label">AI相談</div>
     </div>
-    <div class="quick-btn">
-      <div class="quick-icon">📝</div>
-      <div class="quick-label">メモ</div>
+    <div class="quick-btn" onclick="openMemoModal()">
+      <div class="quick-icon">📝</div><div class="quick-label">メモ</div>
     </div>
   </div>
 </div>
@@ -447,152 +448,629 @@ body {
 <!-- TIMELINE -->
 <div class="section">
   <div class="section-title">🕐 今日のタイムライン</div>
-  <div class="timeline">
-    <div class="timeline-item">
-      <span class="timeline-time">9:02</span>
-      <span class="timeline-dot dot-green"></span>
-      <div class="timeline-content">
-        <div class="timeline-text">林さんが出勤しました</div>
-        <div class="timeline-source">テイクバック流通</div>
-      </div>
+  <div class="timeline" id="timeline"></div>
+</div>
+
+</div><!-- /tab-home -->
+
+<!-- ===== TAB: SALES ===== -->
+<div class="tab-view" id="tab-sales">
+<div class="greeting-section">
+  <div class="greeting-time">SALES OVERVIEW</div>
+  <div class="greeting-name" style="font-size:20px;">売上確認</div>
+  <div class="gold-line"></div>
+</div>
+<div class="section">
+  <div class="section-title">📊 今月の売上</div>
+  <div class="kpi-grid" id="salesKpiGrid"></div>
+</div>
+<div class="section">
+  <div class="section-title">📋 直近の売上</div>
+  <div id="salesList"></div>
+</div>
+</div>
+
+<!-- ===== TAB: APPROVAL ===== -->
+<div class="tab-view" id="tab-approval">
+<div class="greeting-section">
+  <div class="greeting-time">APPROVALS</div>
+  <div class="greeting-name" style="font-size:20px;">承認待ち</div>
+  <div class="gold-line"></div>
+</div>
+<div class="section">
+  <div class="approval-list" id="approvalListFull"></div>
+</div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- 承認詳細モーダル -->
+<div class="modal-overlay" id="approvalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">承認確認</span>
+      <button class="modal-close" onclick="closeModal('approvalModal')">✕</button>
     </div>
-    <div class="timeline-item">
-      <span class="timeline-time">9:15</span>
-      <span class="timeline-dot"></span>
-      <div class="timeline-content">
-        <div class="timeline-text">分荷判定 3件完了（林さん）</div>
-        <div class="timeline-source">テイクバック流通</div>
-      </div>
+    <div id="approvalDetail"></div>
+    <div class="modal-field">
+      <div class="modal-label">コメント（任意）</div>
+      <textarea class="modal-textarea" id="approvalComment" placeholder="コメントがあれば入力"></textarea>
     </div>
-    <div class="timeline-item">
-      <span class="timeline-time">9:30</span>
-      <span class="timeline-dot dot-red"></span>
-      <div class="timeline-content">
-        <div class="timeline-text">高額品承認リクエスト ¥45,000</div>
-        <div class="timeline-source">テイクバック流通 ・ 桃井さん</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <span class="timeline-time">10:00</span>
-      <span class="timeline-dot dot-green"></span>
-      <div class="timeline-content">
-        <div class="timeline-text">横山さん・奥村さんが出勤しました</div>
-        <div class="timeline-source">テイクバック流通</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <span class="timeline-time">10:20</span>
-      <span class="timeline-dot dot-yellow"></span>
-      <div class="timeline-content">
-        <div class="timeline-text">岐阜市蔵前 現場作業開始</div>
-        <div class="timeline-source">テイクバック再生</div>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <span class="timeline-time">11:00</span>
-      <span class="timeline-dot dot-blue"></span>
-      <div class="timeline-content">
-        <div class="timeline-text">eBay注文 1件（¥12,800）</div>
-        <div class="timeline-source">テイクバック流通</div>
-      </div>
+    <div class="btn-row">
+      <button class="modal-btn btn-gold" onclick="doApproval(true)">承認する</button>
+      <button class="modal-btn btn-danger" onclick="doApproval(false)">差し戻す</button>
     </div>
   </div>
 </div>
 
-</div><!-- /main-content -->
+<!-- 代理連絡モーダル -->
+<div class="modal-overlay" id="proxyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">代理連絡</span>
+      <button class="modal-close" onclick="closeModal('proxyModal')">✕</button>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">スタッフ</div>
+      <select class="modal-select" id="proxyStaff"></select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">種別</div>
+      <select class="modal-select" id="proxyType" onchange="onProxyTypeChange()">
+        <option value="欠勤">欠勤（終日休み）</option>
+        <option value="遅刻">遅刻</option>
+        <option value="早退">早退</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">日付</div>
+      <input type="date" class="modal-input" id="proxyDate">
+    </div>
+    <div class="modal-field" id="proxyTimeField" style="display:none;">
+      <div class="modal-label">時刻</div>
+      <input type="time" class="modal-input" id="proxyTime">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">理由（任意）</div>
+      <textarea class="modal-textarea" id="proxyReason" placeholder="例：電話連絡あり、体調不良"></textarea>
+    </div>
+    <button class="modal-btn btn-gold" onclick="submitProxy()">登録する</button>
+  </div>
+</div>
+
+<!-- メモモーダル -->
+<div class="modal-overlay" id="memoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">メモ</span>
+      <button class="modal-close" onclick="closeModal('memoModal')">✕</button>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">内容</div>
+      <textarea class="modal-textarea" id="memoText" placeholder="電話の内容、伝言など" style="min-height:120px;"></textarea>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">関連スタッフ（任意）</div>
+      <select class="modal-select" id="memoStaff"><option value="">選択なし</option></select>
+    </div>
+    <button class="modal-btn btn-gold" onclick="saveMemo()">保存する</button>
+  </div>
+</div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <div class="nav-item active">
-    <span class="nav-icon">🏠</span>ホーム
-  </div>
-  <div class="nav-item">
-    <span class="nav-icon">📊</span>経営
-  </div>
-  <div class="nav-item">
-    <span class="nav-icon">✅</span>承認
-  </div>
-  <div class="nav-item">
-    <span class="nav-icon">💬</span>AI
-  </div>
-  <div class="nav-item">
-    <span class="nav-icon">⚙️</span>設定
-  </div>
+  <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span>ホーム</div>
+  <div class="nav-item" onclick="switchTab('sales')"><span class="nav-icon">💰</span>売上</div>
+  <div class="nav-item" onclick="switchTab('approval')"><span class="nav-icon">✅</span>承認</div>
+  <div class="nav-item" onclick="showToast('準備中です')"><span class="nav-icon">💬</span>AI</div>
+  <div class="nav-item" onclick="showToast('準備中です')"><span class="nav-icon">⚙️</span>設定</div>
 </div>
 
+<script src="js/config.js"></script>
 <script>
-// ===== 挨拶の時間帯切り替え =====
+// ===== STAFF CONFIG =====
+const STAFF = CONFIG.STAFF.filter(s => s.name !== '浅野儀頼');
+const GAS_URL = CONFIG.GAS_URL;
+
+// ===== UTILITY =====
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function formatYen(n) {
+  if (!n && n !== 0) return '--';
+  if (n >= 1000000) return '¥' + (n / 1000000).toFixed(1) + 'M';
+  if (n >= 10000) return '¥' + (n / 10000).toFixed(1) + '万';
+  return '¥' + n.toLocaleString();
+}
+function timeAgo(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - new Date(ts).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 60) return min + '分前';
+  const h = Math.floor(min / 60);
+  if (h < 24) return h + '時間前';
+  return Math.floor(h / 24) + '日前';
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((n, i) => {
+    n.classList.toggle('active', ['home','sales','approval','ai','settings'][i] === tab);
+  });
+  window.scrollTo(0, 0);
+  if (tab === 'approval') renderApprovalsFull();
+  if (tab === 'sales') renderSalesTab();
+}
+
+// ===== GREETING =====
 function updateGreeting() {
   const h = new Date().getHours();
-  const el = document.getElementById('greetingTime');
-  if (h < 12) el.textContent = 'GOOD MORNING';
-  else if (h < 17) el.textContent = 'GOOD AFTERNOON';
-  else el.textContent = 'GOOD EVENING';
-}
-
-// ===== 日付表示 =====
-function updateDate() {
+  document.getElementById('greetingTime').textContent =
+    h < 12 ? 'GOOD MORNING' : h < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
   const now = new Date();
   const days = ['日','月','火','水','木','金','土'];
-  const el = document.getElementById('greetingDate');
-  el.textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
+  document.getElementById('greetingDate').textContent =
+    `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
 }
 
-// ===== 事業部アプリへの遷移 =====
-function openApp(appId) {
-  const apps = {
-    takeback: 'index.html',
-    saisei: null,    // 未実装
-    clearmainte: null, // 未実装
-    aix: null,       // 未実装
-    askara: null     // 未実装
-  };
-  const url = apps[appId];
-  if (url) {
-    window.location.href = url;
-  } else {
-    showToast('準備中です');
+// ===== 1. SALES KPI (実データ) =====
+function getSalesData() {
+  try { return JSON.parse(localStorage.getItem('f8_sales') || '[]'); }
+  catch { return []; }
+}
+function calcSalesKPI() {
+  const sales = getSalesData();
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const lastMonth = now.getMonth() === 0
+    ? `${now.getFullYear()-1}-12`
+    : `${now.getFullYear()}-${String(now.getMonth()).padStart(2,'0')}`;
+
+  let thisSales = 0, thisProfit = 0, thisCount = 0;
+  let lastSales = 0, lastProfit = 0, lastCount = 0;
+
+  sales.forEach(s => {
+    const month = (s.timestamp || s.createdAt || '').slice(0, 7);
+    const price = Number(s.price) || 0;
+    const fee = Number(s.fee) || 0;
+    const shipping = Number(s.shipping) || 0;
+    const profit = price - fee - shipping;
+    if (month === thisMonth) { thisSales += price; thisProfit += profit; thisCount++; }
+    if (month === lastMonth) { lastSales += price; lastProfit += profit; lastCount++; }
+  });
+
+  return { thisSales, thisProfit, thisCount, lastSales, lastProfit, lastCount };
+}
+function renderKPI() {
+  const kpi = calcSalesKPI();
+  document.getElementById('kpiSales').textContent = formatYen(kpi.thisSales);
+  document.getElementById('kpiProfit').textContent = formatYen(kpi.thisProfit);
+  document.getElementById('kpiCount').textContent = kpi.thisCount + '件';
+
+  // 在庫
+  const items = getItems();
+  const activeItems = items.filter(i => !i.shipped && !i.deleted);
+  document.getElementById('kpiInventory').textContent = activeItems.length + '点';
+  document.getElementById('kpiInvChange').textContent = '在庫中';
+  document.getElementById('kpiInvChange').className = 'kpi-change kpi-flat';
+
+  // 前月比
+  function setChange(id, thisVal, lastVal) {
+    const el = document.getElementById(id);
+    if (lastVal === 0) { el.textContent = thisVal > 0 ? 'NEW' : '—'; el.className = 'kpi-change kpi-flat'; return; }
+    const pct = Math.round((thisVal - lastVal) / lastVal * 100);
+    el.textContent = pct >= 0 ? `↑ +${pct}%` : `↓ ${pct}%`;
+    el.className = 'kpi-change ' + (pct >= 0 ? 'kpi-up' : 'kpi-down');
+  }
+  setChange('kpiSalesChange', kpi.thisSales, kpi.lastSales);
+  setChange('kpiProfitChange', kpi.thisProfit, kpi.lastProfit);
+  setChange('kpiCountChange', kpi.thisCount, kpi.lastCount);
+
+  // テイクバック事業部カード更新
+  document.getElementById('bizTakebackAmount').textContent = formatYen(kpi.thisSales);
+  document.getElementById('bizTakebackMeta').textContent = `スタッフ${STAFF.length}名 ・ 在庫 ${activeItems.length}点`;
+  if (kpi.lastSales > 0) {
+    const pct = Math.round((kpi.thisSales - kpi.lastSales) / kpi.lastSales * 100);
+    document.getElementById('bizTakebackStatus').textContent = pct >= 0 ? `前月比 +${pct}%` : `前月比 ${pct}%`;
   }
 }
 
-// ===== トースト通知 =====
+// ===== 2. APPROVAL (実データ) =====
+function getItems() {
+  try {
+    const data = JSON.parse(localStorage.getItem('f8_takeback_data') || '{}');
+    return data.items || [];
+  } catch { return []; }
+}
+function getPendingApprovals() {
+  return getItems().filter(i => i.needsApproval && !i.approved && !i.rejected);
+}
+let selectedApprovalItem = null;
+
+function renderApprovals() {
+  const pending = getPendingApprovals();
+  const banner = document.getElementById('alertBanner');
+  const notif = document.getElementById('notifCount');
+
+  if (pending.length > 0) {
+    banner.classList.add('show');
+    document.getElementById('alertText').textContent = `承認待ちが${pending.length}件あります — タップして確認`;
+    notif.textContent = pending.length;
+    notif.classList.remove('hidden');
+  } else {
+    banner.classList.remove('show');
+    notif.classList.add('hidden');
+  }
+}
+function renderApprovalsFull() {
+  const pending = getPendingApprovals();
+  const el = document.getElementById('approvalListFull');
+  if (pending.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>承認待ちはありません</div>';
+    return;
+  }
+  el.innerHTML = pending.map((item, i) => {
+    const reason = item.approvalReason || '確認';
+    const badgeClass = reason === '高額品' ? 'badge-urgent' : 'badge-normal';
+    const priceStr = item.estimatedPrice
+      ? `¥${(item.estimatedPrice.min||0).toLocaleString()}〜¥${(item.estimatedPrice.max||0).toLocaleString()}`
+      : '';
+    return `<div class="approval-card" onclick="openApprovalDetail(${i})">
+      <span class="approval-badge ${badgeClass}">${reason}</span>
+      <div class="approval-content">
+        <div class="approval-title">${item.mgmtNum || ''} ${item.productName || '商品'} ${priceStr}</div>
+        <div class="approval-meta">テイクバック流通 ・ ${item.staff || ''}から ・ ${timeAgo(item.createdAt)}</div>
+      </div>
+      <span class="approval-action">確認 ›</span>
+    </div>`;
+  }).join('');
+}
+function openApprovalDetail(idx) {
+  const pending = getPendingApprovals();
+  selectedApprovalItem = pending[idx];
+  if (!selectedApprovalItem) return;
+  const item = selectedApprovalItem;
+  const priceStr = item.estimatedPrice
+    ? `¥${(item.estimatedPrice.min||0).toLocaleString()} 〜 ¥${(item.estimatedPrice.max||0).toLocaleString()}`
+    : '未設定';
+  document.getElementById('approvalDetail').innerHTML = `
+    <div class="approval-detail-item"><div class="approval-detail-label">管理番号</div><div class="approval-detail-value">${item.mgmtNum || '—'}</div></div>
+    <div class="approval-detail-item"><div class="approval-detail-label">商品名</div><div class="approval-detail-value">${item.productName || '—'}</div></div>
+    <div class="approval-detail-item"><div class="approval-detail-label">推定価格</div><div class="approval-price">${priceStr}</div></div>
+    <div class="approval-detail-item"><div class="approval-detail-label">チャンネル</div><div class="approval-detail-value">${item.channel || '—'}</div></div>
+    <div class="approval-detail-item"><div class="approval-detail-label">理由</div><div class="approval-detail-value">${item.approvalReason || '—'}</div></div>
+    <div class="approval-detail-item"><div class="approval-detail-label">担当</div><div class="approval-detail-value">${item.staff || '—'}</div></div>
+  `;
+  document.getElementById('approvalComment').value = '';
+  openModal('approvalModal');
+}
+function doApproval(approve) {
+  if (!selectedApprovalItem) return;
+  const data = JSON.parse(localStorage.getItem('f8_takeback_data') || '{}');
+  const items = data.items || [];
+  const item = items.find(i => i.mgmtNum === selectedApprovalItem.mgmtNum);
+  if (!item) { showToast('商品が見つかりません'); return; }
+
+  const comment = document.getElementById('approvalComment').value.trim();
+  const now = new Date().toISOString();
+
+  if (approve) {
+    item.approved = true;
+    item.approvedAt = now;
+    item.approvedBy = '浅野儀頼';
+  } else {
+    item.rejected = true;
+    item.rejectedAt = now;
+    item.rejectedBy = '浅野儀頼';
+    item.rejectReason = comment || '差し戻し';
+  }
+
+  data.items = items;
+  localStorage.setItem('f8_takeback_data', JSON.stringify(data));
+
+  // GAS通知
+  sendToGAS({
+    action: 'approval_result',
+    mgmtNum: item.mgmtNum,
+    itemName: item.productName,
+    staff: item.staff,
+    result: approve ? '承認' : '差し戻し',
+    comment: comment,
+    timestamp: new Date().toLocaleString('ja-JP')
+  });
+
+  closeModal('approvalModal');
+  showToast(approve ? '承認しました' : '差し戻しました');
+  renderApprovals();
+  renderApprovalsFull();
+  selectedApprovalItem = null;
+}
+
+// ===== 3. STAFF STATUS (実データ) =====
+function getLeaveRequests() {
+  try { return JSON.parse(localStorage.getItem('f8_leave_requests') || '[]'); }
+  catch { return []; }
+}
+function getAttendance(staffName) {
+  const key = `f8_attendance_${todayStr()}_detail_${staffName}`;
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); }
+  catch { return null; }
+}
+function renderStaffStatus() {
+  const today = todayStr();
+  const dow = new Date().getDay();
+  const leaves = getLeaveRequests();
+  const todayLeaves = leaves.filter(l => l.date === today);
+
+  const html = STAFF.map(s => {
+    const leave = todayLeaves.find(l => l.staffName === s.name);
+    const attendance = getAttendance(s.name);
+    const isScheduledOff = s.offDays.includes(dow);
+
+    let status, tagClass, avatarClass, detail;
+
+    if (leave && leave.type === '欠勤') {
+      status = '欠勤'; tagClass = 'tag-absent'; avatarClass = 'avatar-leave';
+      detail = leave.reason || '休み';
+    } else if (leave && leave.type === '遅刻') {
+      status = '遅刻'; tagClass = 'tag-late'; avatarClass = 'avatar-late';
+      detail = `${leave.time || ''}出勤予定 ${leave.reason || ''}`.trim();
+    } else if (leave && leave.type === '早退') {
+      status = '早退'; tagClass = 'tag-late'; avatarClass = 'avatar-late';
+      detail = `${leave.time || ''}退勤予定 ${leave.reason || ''}`.trim();
+    } else if (isScheduledOff) {
+      status = '定休'; tagClass = 'tag-off'; avatarClass = 'avatar-off';
+      detail = s.pattern;
+    } else if (attendance && attendance.start) {
+      status = '出勤中'; tagClass = 'tag-working'; avatarClass = 'avatar-working';
+      detail = `${attendance.start}〜${attendance.end || ''}`;
+    } else {
+      const now = new Date();
+      const [sh, sm] = s.start.split(':').map(Number);
+      const startMin = sh * 60 + sm;
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      if (nowMin < startMin) {
+        status = '出勤前'; tagClass = 'tag-off'; avatarClass = 'avatar-off';
+        detail = `${s.start}出勤予定`;
+      } else {
+        status = '予定出勤'; tagClass = 'tag-working'; avatarClass = 'avatar-working';
+        detail = `${s.start}〜${s.end}`;
+      }
+    }
+
+    const initial = s.name.slice(-2);
+    const company = s.company ? ` (${s.company})` : '';
+
+    return `<div class="staff-row">
+      <div class="staff-avatar ${avatarClass}">${initial}</div>
+      <div class="staff-info">
+        <div class="staff-name">${s.name}${company}</div>
+        <div class="staff-detail">${detail}</div>
+      </div>
+      <span class="staff-status-tag ${tagClass}">${status}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('staffGrid').innerHTML = html;
+}
+
+// ===== 4. PROXY LEAVE (代理連絡) =====
+function openProxyModal() {
+  const sel = document.getElementById('proxyStaff');
+  sel.innerHTML = STAFF.map(s => `<option value="${s.name}">${s.name}${s.company ? ' ('+s.company+')' : ''}</option>`).join('');
+  document.getElementById('proxyDate').value = todayStr();
+  document.getElementById('proxyType').value = '欠勤';
+  document.getElementById('proxyReason').value = '';
+  document.getElementById('proxyTime').value = '';
+  onProxyTypeChange();
+  openModal('proxyModal');
+}
+function onProxyTypeChange() {
+  const type = document.getElementById('proxyType').value;
+  document.getElementById('proxyTimeField').style.display = type === '欠勤' ? 'none' : 'block';
+}
+function submitProxy() {
+  const staffName = document.getElementById('proxyStaff').value;
+  const type = document.getElementById('proxyType').value;
+  const date = document.getElementById('proxyDate').value;
+  const time = document.getElementById('proxyTime').value;
+  const reason = document.getElementById('proxyReason').value.trim();
+
+  if (!staffName || !date) { showToast('スタッフと日付を入力してください'); return; }
+
+  const leaves = getLeaveRequests();
+  leaves.push({
+    type, date, time: type !== '欠勤' ? time : null,
+    reason: reason || '浅野代理登録',
+    staffName, submittedAt: new Date().toISOString(),
+    approved: true, approvedBy: '浅野儀頼', approvedAt: new Date().toISOString()
+  });
+  localStorage.setItem('f8_leave_requests', JSON.stringify(leaves));
+
+  // GAS通知
+  sendToGAS({
+    action: 'leave_request',
+    type, dates: date, time: time || '',
+    reason: reason || '浅野代理登録',
+    staff: staffName,
+    proxy: true,
+    timestamp: new Date().toLocaleString('ja-JP')
+  });
+
+  closeModal('proxyModal');
+  showToast(`${staffName}さんの${type}を登録しました`);
+  renderStaffStatus();
+  addTimelineEvent(`${staffName}さんの${type}を代理登録`, 'テイクバック', 'dot-yellow');
+}
+
+// ===== MEMO =====
+function openMemoModal() {
+  const sel = document.getElementById('memoStaff');
+  sel.innerHTML = '<option value="">選択なし</option>' +
+    STAFF.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+  document.getElementById('memoText').value = '';
+  openModal('memoModal');
+}
+function saveMemo() {
+  const text = document.getElementById('memoText').value.trim();
+  if (!text) { showToast('内容を入力してください'); return; }
+  const staff = document.getElementById('memoStaff').value;
+
+  const memos = JSON.parse(localStorage.getItem('f8_exec_memos') || '[]');
+  memos.unshift({
+    text, staff, createdAt: new Date().toISOString()
+  });
+  localStorage.setItem('f8_exec_memos', JSON.stringify(memos));
+
+  closeModal('memoModal');
+  showToast('メモを保存しました');
+  addTimelineEvent(`メモ: ${text.slice(0, 30)}${text.length > 30 ? '...' : ''}`, staff ? `${staff}関連` : '', 'dot-blue');
+}
+
+// ===== SALES TAB =====
+function renderSalesTab() {
+  const sales = getSalesData();
+  const kpi = calcSalesKPI();
+
+  document.getElementById('salesKpiGrid').innerHTML = `
+    <div class="kpi-card"><div class="kpi-value">${formatYen(kpi.thisSales)}</div><div class="kpi-label">今月売上</div></div>
+    <div class="kpi-card"><div class="kpi-value">${formatYen(kpi.thisProfit)}</div><div class="kpi-label">今月粗利</div></div>
+    <div class="kpi-card"><div class="kpi-value">${kpi.thisCount}件</div><div class="kpi-label">販売件数</div></div>
+    <div class="kpi-card"><div class="kpi-value">${kpi.thisCount > 0 ? formatYen(Math.round(kpi.thisSales / kpi.thisCount)) : '--'}</div><div class="kpi-label">平均単価</div></div>
+  `;
+
+  const recent = sales.slice(0, 20);
+  if (recent.length === 0) {
+    document.getElementById('salesList').innerHTML = '<div class="empty-state"><div class="empty-icon">💰</div>売上データはまだありません</div>';
+    return;
+  }
+  document.getElementById('salesList').innerHTML = recent.map(s => {
+    const profit = (Number(s.price)||0) - (Number(s.fee)||0) - (Number(s.shipping)||0);
+    return `<div class="staff-row" style="margin-bottom:6px;">
+      <div class="staff-info">
+        <div class="staff-name">${s.itemName || '商品'}</div>
+        <div class="staff-detail">${s.mgmtNum || ''} ・ ${s.channel || ''} ・ ${s.staff || ''} ・ ${(s.timestamp || s.createdAt || '').slice(0,10)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:14px;font-weight:700;color:var(--gold);">¥${(Number(s.price)||0).toLocaleString()}</div>
+        <div style="font-size:11px;color:${profit>=0?'var(--success)':'var(--danger)'};">粗利 ¥${profit.toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== TIMELINE =====
+function buildTimeline() {
+  const events = [];
+  const today = todayStr();
+
+  // 出勤情報
+  STAFF.forEach(s => {
+    const att = getAttendance(s.name);
+    if (att && att.start) {
+      events.push({ time: att.start, text: `${s.name}さんが出勤しました`, source: s.company || 'テイクバック流通', dot: 'dot-green' });
+    }
+  });
+
+  // 休み情報
+  const leaves = getLeaveRequests().filter(l => l.date === today);
+  leaves.forEach(l => {
+    events.push({ time: '—', text: `${l.staffName}さん ${l.type}`, source: l.reason || '', dot: 'dot-red' });
+  });
+
+  // 承認リクエスト
+  const pending = getPendingApprovals();
+  pending.forEach(item => {
+    const t = item.createdAt ? new Date(item.createdAt).toTimeString().slice(0,5) : '—';
+    events.push({ time: t, text: `承認リクエスト: ${item.productName || item.mgmtNum}`, source: `${item.staff || ''}・テイクバック流通`, dot: 'dot-red' });
+  });
+
+  // メモ
+  const memos = JSON.parse(localStorage.getItem('f8_exec_memos') || '[]');
+  memos.filter(m => m.createdAt && m.createdAt.startsWith(today)).forEach(m => {
+    const t = new Date(m.createdAt).toTimeString().slice(0,5);
+    events.push({ time: t, text: `メモ: ${m.text.slice(0,40)}`, source: m.staff || '', dot: 'dot-blue' });
+  });
+
+  // 売上
+  const sales = getSalesData();
+  sales.filter(s => (s.timestamp || s.createdAt || '').startsWith(today)).forEach(s => {
+    const t = (s.timestamp || s.createdAt || '').slice(11, 16) || '—';
+    events.push({ time: t, text: `売上: ${s.itemName || '商品'} ¥${(Number(s.price)||0).toLocaleString()}`, source: s.channel || '', dot: 'dot-blue' });
+  });
+
+  // 時刻順ソート
+  events.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+
+  const el = document.getElementById('timeline');
+  if (events.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🕐</div>今日のイベントはまだありません</div>';
+    return;
+  }
+  el.innerHTML = events.map(e => `<div class="timeline-item">
+    <span class="timeline-time">${e.time}</span>
+    <span class="timeline-dot ${e.dot || ''}"></span>
+    <div class="timeline-content">
+      <div class="timeline-text">${e.text}</div>
+      ${e.source ? `<div class="timeline-source">${e.source}</div>` : ''}
+    </div>
+  </div>`).join('');
+}
+function addTimelineEvent(text, source, dot) {
+  buildTimeline(); // 簡易再描画
+}
+
+// ===== GAS SEND =====
+function sendToGAS(data) {
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(() => {});
+}
+
+// ===== MODAL =====
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ===== APP NAVIGATION =====
+function openApp(appId) {
+  const apps = { takeback: 'index.html', saisei: null, clearmainte: null, aix: null, askara: null };
+  const url = apps[appId];
+  if (url) window.location.href = url;
+  else showToast('準備中です');
+}
+function scrollToStaff() { document.getElementById('staffGrid').scrollIntoView({ behavior: 'smooth' }); }
+
+// ===== TOAST =====
 function showToast(msg) {
   let t = document.getElementById('toast');
   if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = `
-      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-      background: #333; color: #fff; padding: 10px 24px; border-radius: 8px;
-      font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s;
-    `;
+    t = document.createElement('div'); t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;';
     document.body.appendChild(t);
   }
-  t.textContent = msg;
-  t.style.opacity = '1';
+  t.textContent = msg; t.style.opacity = '1';
   setTimeout(() => { t.style.opacity = '0'; }, 2000);
 }
 
-// ===== ボトムナビ切り替え =====
-document.querySelectorAll('.nav-item').forEach((item, i) => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    item.classList.add('active');
-    // TODO: タブ切り替え実装
-    if (i > 0) showToast('準備中です');
-  });
-});
-
-// ===== アラートバナー =====
-document.getElementById('alertBanner').addEventListener('click', () => {
-  // 承認セクションまでスクロール
-  document.querySelector('.approval-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
-
-// ===== 初期化 =====
+// ===== INIT =====
 updateGreeting();
-updateDate();
-</script>
+renderKPI();
+renderApprovals();
+renderStaffStatus();
+buildTimeline();
 
+// 30秒ごとに自動更新
+setInterval(() => {
+  renderKPI();
+  renderApprovals();
+  renderStaffStatus();
+  buildTimeline();
+}, 30000);
+</script>
 </body>
 </html>
