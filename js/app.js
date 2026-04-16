@@ -3013,8 +3013,68 @@ function submitAttendance() {
 
   showToast('🕐 勤務記録を送信しました');
 
+  // freee人事労務に勤怠登録
+  sendToFreee(today, start, end, noBreak, breakStart, breakEnd);
+
   // ホーム画面の出勤メンバー更新
   renderMemberTimeline();
+}
+
+// freee勤怠登録
+async function sendToFreee(date, clockIn, clockOut, noBreak, breakStart, breakEnd) {
+  try {
+    // スタッフ名→freee従業員IDのマッピング（設定で管理）
+    const staffFreeeMap = JSON.parse(localStorage.getItem('f8_freee_staff_map') || '{}');
+    const employeeId = staffFreeeMap[currentUser.name];
+    if (!employeeId) {
+      console.log('[freee] 従業員IDが未設定: ' + currentUser.name);
+      return;
+    }
+
+    // 会社判定（クリアメンテ所属はclearmaintenance、それ以外はtakeback）
+    const staffConfig = CONFIG.STAFF.find(s => s.name === currentUser.name);
+    const company = staffConfig?.company === 'クリアメンテ' ? 'clearmaintenance' : 'takeback';
+    const companyIdMap = JSON.parse(localStorage.getItem('f8_freee_company_ids') || '{}');
+    const companyId = companyIdMap[company];
+    if (!companyId) {
+      console.log('[freee] company_idが未設定: ' + company);
+      return;
+    }
+
+    const breakRecords = [];
+    if (!noBreak && breakStart && breakEnd) {
+      breakRecords.push({
+        clock_in_at: date + 'T' + breakStart + ':00+09:00',
+        clock_out_at: date + 'T' + breakEnd + ':00+09:00',
+      });
+    }
+
+    const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/freee-api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        action: 'work_record',
+        company: company,
+        company_id: companyId,
+        employee_id: employeeId,
+        date: date,
+        work_record: {
+          clock_in_at: date + 'T' + clockIn + ':00+09:00',
+          clock_out_at: date + 'T' + clockOut + ':00+09:00',
+          break_records: breakRecords,
+        },
+      }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      console.log('[freee] 勤怠登録成功');
+    } else {
+      console.error('[freee] 勤怠登録エラー:', result.error || result);
+    }
+  } catch(e) {
+    console.error('[freee] 送信エラー:', e);
+  }
 }
 
 function checkTodayAttendance() {
