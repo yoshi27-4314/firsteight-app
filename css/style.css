@@ -1285,6 +1285,21 @@ body[data-theme="female"] {
   height: 1px; background: #2A3553; margin: 4px 16px;
 }
 
+/* ====== 保管場所グリッド（小） ====== */
+.location-grid-small { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.location-grid-small .location-btn { font-size: 12px; padding: 8px 4px; }
+.loc-base.selected, .loc-detail.selected {
+  background: var(--gold); color: #000; border-color: var(--gold);
+}
+
+/* ====== 管理番号バナー ====== */
+.mgmt-num-banner {
+  background: linear-gradient(135deg, rgba(197,162,88,0.2), rgba(197,162,88,0.05));
+  border: 1px solid var(--gold); border-radius: 10px;
+  padding: 8px 16px; margin-bottom: 12px; text-align: center;
+  font-size: 16px; font-weight: 700; color: var(--gold);
+}
+
 /* ====== PIN入力 ====== */
 .pin-input-row {
   display: flex; gap: 12px; justify-content: center; margin-top: 8px;

@@ -804,6 +804,7 @@
           <div class="ai-actions">
             <button class="btn btn-primary" id="acceptBtn" onclick="acceptJudgment()">✅ OK → 状態確認へ</button>
             <button class="btn btn-warn" onclick="consultAsano()">🙋 相談する</button>
+            <button class="btn btn-outline" onclick="requestRejudge()" style="margin-top:8px;">🔄 再判定</button>
             <button class="btn btn-outline" onclick="saveDraft()" style="margin-top:8px; font-size:13px;">💾 一時保存して中断</button>
           </div>
         </div>
@@ -812,6 +813,7 @@
       <!-- ステップ3: 追加撮影ガイド -->
       <div id="cameraStep3" class="camera-step">
         <button class="btn btn-outline step-back-btn" onclick="showCameraStep(2)">← 判定結果に戻る</button>
+        <div id="mgmtNumBanner3" class="mgmt-num-banner" style="display:none;"></div>
         <div class="camera-guide">
           <h3>📸 出品用の商品写真を撮影</h3>
           <p id="guideText">出品に使う写真を撮ります。1枚目がメイン画像になります。</p>
@@ -830,22 +832,61 @@
       <!-- ステップ4: 保管場所 -->
       <div id="cameraStep4" class="camera-step">
         <button class="btn btn-outline step-back-btn" onclick="showCameraStep(3)">← 商品撮影に戻る</button>
+        <div id="mgmtNumBanner4" class="mgmt-num-banner" style="display:none;"></div>
         <div class="section">
           <h3 class="section-title">📍 保管場所を選択</h3>
+          <!-- 拠点選択 -->
+          <p style="font-size:13px; color:var(--sub); margin-bottom:8px;">① 拠点</p>
           <div class="location-grid">
-            <button class="location-btn" onclick="selectLocation('A-1')">A-1</button>
-            <button class="location-btn" onclick="selectLocation('A-2')">A-2</button>
-            <button class="location-btn" onclick="selectLocation('A-3')">A-3</button>
-            <button class="location-btn" onclick="selectLocation('B-1')">B-1</button>
-            <button class="location-btn" onclick="selectLocation('B-2')">B-2</button>
-            <button class="location-btn" onclick="selectLocation('B-3')">B-3</button>
-            <button class="location-btn" onclick="selectLocation('C-1')">C-1</button>
-            <button class="location-btn" onclick="selectLocation('C-2')">C-2</button>
-            <button class="location-btn" onclick="selectLocation('C-3')">C-3</button>
+            <button class="location-btn loc-base" onclick="selectBase('本荘')">本荘</button>
+            <button class="location-btn loc-base" onclick="selectBase('厚見')">厚見</button>
+            <button class="location-btn loc-base" onclick="selectBase('柳津')">柳津</button>
           </div>
-          <div class="form-group" style="margin-top:16px">
-            <input type="text" id="locationCustom" placeholder="その他（自由入力）" class="search-input">
+          <!-- 厚見の詳細（厚見選択時のみ表示） -->
+          <div id="locAtsumi" style="display:none; margin-top:12px;">
+            <p style="font-size:13px; color:var(--sub); margin-bottom:8px;">② 厚見の場所</p>
+            <div class="location-grid location-grid-small">
+              <button class="location-btn loc-detail" onclick="selectDetail('A1')">A1</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A2')">A2</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A3')">A3</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A4')">A4</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A5')">A5</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A6')">A6</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A7')">A7</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A8')">A8</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A9')">A9</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A10')">A10</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A11')">A11</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A12')">A12</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A13')">A13</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A14')">A14</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A15')">A15</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A16')">A16</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A17')">A17</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A18')">A18</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A19')">A19</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A20')">A20</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A21')">A21</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A22')">A22</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A23')">A23</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A24')">A24</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A25')">A25</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A26')">A26</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A27')">A27</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('A28')">A28</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('倉庫奥')">倉庫奥</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('倉庫外')">倉庫外</button>
+              <button class="location-btn loc-detail" onclick="selectDetail('2階')">2階</button>
+            </div>
           </div>
+          <!-- 追記・フリー入力 -->
+          <div class="form-group" style="margin-top:12px;">
+            <input type="text" id="locationCustom" placeholder="追記（自由入力）" class="search-input">
+          </div>
+          <!-- 選択結果の表示 -->
+          <div id="locationPreview" style="display:none; margin-top:8px; padding:10px; background:rgba(197,162,88,0.1); border-radius:8px; font-size:14px; color:var(--gold); font-weight:600;"></div>
+          <!-- 決定ボタン -->
+          <button id="locationConfirmBtn" class="btn btn-primary" onclick="confirmLocation()" style="width:100%; margin-top:12px; display:none;">📍 保管場所を決定</button>
         </div>
       </div>
 

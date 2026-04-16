@@ -996,11 +996,13 @@ function renderStockList() {
 
 // ====== 管理番号生成 ======
 function generateManagementNumber() {
+  // フォールバック用ローカル採番（GASが使えないとき）
+  // タイムスタンプ + ランダムで重複を防ぐ
   const prefix = CONFIG.MGMT_PREFIX();
-  const items = getItems();
-  const thisMonth = items.filter(i => i.mgmtNum && i.mgmtNum.startsWith(prefix));
-  const nextSeq = thisMonth.length + 1;
-  return prefix + '-' + String(nextSeq).padStart(4, '0');
+  const now = new Date();
+  const sec = String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+  const rand = String(Math.floor(Math.random() * 100)).padStart(2,'0');
+  return prefix + '-L' + sec + rand; // Lはローカル採番の印
 }
 
 // ====== 入口選択 ======
@@ -1705,8 +1707,24 @@ async function finalizeAcceptJudgment() {
     showToast(`📋 ${mgmtNum} を発行しました（オフライン）`);
   }
 
+  // 管理番号バナーを表示
+  updateMgmtNumBanners();
+
   buildPhotoGuide();
   showCameraStep(3);
+}
+
+function updateMgmtNumBanners() {
+  const num = currentItem.mgmtNum || '';
+  const name = currentItem.productName || '';
+  const text = num ? `📋 ${num}　${name}` : '';
+  ['mgmtNumBanner3', 'mgmtNumBanner4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = text;
+      el.style.display = num ? '' : 'none';
+    }
+  });
 }
 
 // GASから管理番号を取得（委託元ごとにプレフィックス付き）
@@ -1725,6 +1743,16 @@ async function requestMgmtNumFromGAS() {
     return result.mgmtNum;
   }
   throw new Error('GAS採番失敗');
+}
+
+function requestRejudge() {
+  const reason = prompt('再判定の理由を入力してください：');
+  if (reason === null) return;
+  if (!reason.trim()) { showToast('理由を入力してください'); return; }
+  currentItem.rejudgeReason = reason;
+  showToast('🔄 再判定します...');
+  // 1枚目の写真から再判定
+  showCameraStep(1);
 }
 
 function consultAsano() {
@@ -1853,17 +1881,86 @@ function handleGuidePhoto(event) {
 }
 
 function goToStep4() {
+  // 保管場所選択をリセット
+  selectedBase = '';
+  selectedDetail = '';
+  document.querySelectorAll('.loc-base, .loc-detail').forEach(b => b.classList.remove('selected'));
+  const atsumiSection = document.getElementById('locAtsumi');
+  if (atsumiSection) atsumiSection.style.display = 'none';
+  const customInput = document.getElementById('locationCustom');
+  if (customInput) customInput.value = '';
+  const preview = document.getElementById('locationPreview');
+  if (preview) preview.style.display = 'none';
+  const btn = document.getElementById('locationConfirmBtn');
+  if (btn) btn.style.display = 'none';
   showCameraStep(4);
 }
 
-// ====== 保管場所 ======
-function selectLocation(loc) {
-  document.querySelectorAll('.location-btn').forEach(b => b.classList.remove('selected'));
-  event.target.classList.add('selected');
-  currentItem.location = loc;
+// ====== 保管場所（階層式） ======
+let selectedBase = '';
+let selectedDetail = '';
 
-  setTimeout(() => completeRegistration(loc), 300);
+function selectBase(base) {
+  selectedBase = base;
+  selectedDetail = '';
+  document.querySelectorAll('.loc-base').forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+  // 厚見の詳細表示切り替え
+  const atsumiSection = document.getElementById('locAtsumi');
+  if (atsumiSection) {
+    atsumiSection.style.display = base === '厚見' ? '' : 'none';
+  }
+  // 厚見以外は詳細選択をリセット
+  if (base !== '厚見') {
+    document.querySelectorAll('.loc-detail').forEach(b => b.classList.remove('selected'));
+  }
+  updateLocationPreview();
 }
+
+function selectDetail(detail) {
+  selectedDetail = detail;
+  document.querySelectorAll('.loc-detail').forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+  updateLocationPreview();
+}
+
+function updateLocationPreview() {
+  const custom = document.getElementById('locationCustom').value.trim();
+  const loc = buildLocationString(custom);
+  const preview = document.getElementById('locationPreview');
+  const btn = document.getElementById('locationConfirmBtn');
+  if (loc) {
+    preview.textContent = '📍 ' + loc;
+    preview.style.display = '';
+    btn.style.display = '';
+  } else {
+    preview.style.display = 'none';
+    btn.style.display = 'none';
+  }
+}
+
+function buildLocationString(custom) {
+  let parts = [];
+  if (selectedBase) parts.push(selectedBase);
+  if (selectedDetail) parts.push(selectedDetail);
+  if (custom) parts.push(custom);
+  return parts.join(' / ');
+}
+
+function confirmLocation() {
+  const custom = document.getElementById('locationCustom').value.trim();
+  const loc = buildLocationString(custom);
+  if (!loc) { showToast('保管場所を選択してください'); return; }
+  completeRegistration(loc);
+}
+
+// フリー入力の変更を監視
+document.addEventListener('DOMContentLoaded', function() {
+  const customInput = document.getElementById('locationCustom');
+  if (customInput) {
+    customInput.addEventListener('input', updateLocationPreview);
+  }
+});
 
 // ====== 登録完了 ======
 async function completeRegistration(loc) {
