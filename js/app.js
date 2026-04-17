@@ -28,11 +28,24 @@ async function loadItemsFromDB() {
     const { data, error } = await fegDb.from('tkb_items').select('*').order('priority_score', { ascending: false, nullsFirst: false });
     if (error) { console.error('DB読み込みエラー:', error); return; }
     dbItems = data || [];
+    // 30分以上前のロックを自動解除
+    const now = new Date();
+    dbItems.forEach(async (item) => {
+      if (item.locked_by && item.locked_at) {
+        const lockedMinutes = (now - new Date(item.locked_at)) / (1000 * 60);
+        if (lockedMinutes > 30) {
+          await fegDb.from('tkb_items').update({ locked_by: null, locked_at: null }).eq('mgmt_num', item.mgmt_num);
+          item.locked_by = null;
+          item.locked_at = null;
+        }
+      }
+    });
     renderStockListFromDB();
     updateStatusTabCounts();
     updateTodayStats();
   } catch (err) {
     console.error('DB接続エラー:', err);
+    showToast('⚠️ データベースに接続できません。しばらくしてから再試行してください。');
   }
 }
 
@@ -73,18 +86,17 @@ async function updateItemStatus(mgmtNum, status, extra) {
 // ロック（出品開始）
 async function lockItem(mgmtNum, staffName) {
   if (!fegDb) return false;
-  // 既にロックされていないか確認
-  const { data } = await fegDb.from('tkb_items').select('locked_by').eq('mgmt_num', mgmtNum).single();
-  if (data?.locked_by) {
-    showToast(`⚠️ ${data.locked_by}さんが作業中です`);
-    return false;
-  }
-  const { error } = await fegDb.from('tkb_items').update({
+  // アトミックな楽観的ロック（locked_byがnullの場合のみ更新）
+  const { data, error } = await fegDb.from('tkb_items').update({
     locked_by: staffName,
     locked_at: new Date().toISOString(),
-    status: '出品作業中',
-  }).eq('mgmt_num', mgmtNum);
-  if (error) { console.error('ロックエラー:', error); return false; }
+  }).is('locked_by', null).eq('mgmt_num', mgmtNum).select();
+  if (error || !data || data.length === 0) {
+    // ロック失敗 = 誰かが先にロック済み
+    const { data: current } = await fegDb.from('tkb_items').select('locked_by').eq('mgmt_num', mgmtNum).single();
+    showToast(`⚠️ ${current?.locked_by || '他のスタッフ'}さんが作業中です`);
+    return false;
+  }
   return true;
 }
 
@@ -898,6 +910,13 @@ function getItems() {
 // ====== PIN認証 ======
 const PIN_KEY = 'f8_pins';
 
+async function hashPin(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin + '_f8salt_tkb');
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function getStoredPins() {
   return JSON.parse(localStorage.getItem(PIN_KEY) || '{}');
 }
@@ -938,7 +957,7 @@ function getPinFromInputs() {
   return pin;
 }
 
-function doLogin() {
+async function doLogin() {
   const sel = document.getElementById('loginStaff');
   const name = sel.value;
   if (!name) { showToast('スタッフを選択してください'); return; }
@@ -947,9 +966,10 @@ function doLogin() {
   if (pin.length !== 4) { showToast('4桁の暗証番号を入力してください'); return; }
 
   const pins = getStoredPins();
+  const hashedPin = await hashPin(pin);
   if (pins[name]) {
-    // PINが登録済み → 照合
-    if (pins[name] !== pin) {
+    // PINが登録済み → 照合（ハッシュ比較）
+    if (pins[name] !== hashedPin && pins[name] !== pin) {
       document.getElementById('pinError').style.display = '';
       // PIN入力をクリア
       for (let i = 1; i <= 4; i++) {
@@ -958,9 +978,14 @@ function doLogin() {
       document.getElementById('pinInput1').focus();
       return;
     }
+    // 旧平文PINをハッシュに移行
+    if (pins[name] === pin) {
+      pins[name] = hashedPin;
+      localStorage.setItem(PIN_KEY, JSON.stringify(pins));
+    }
   } else {
     // 初回ログイン → PINを登録
-    pins[name] = pin;
+    pins[name] = hashedPin;
     localStorage.setItem(PIN_KEY, JSON.stringify(pins));
     showToast('🔐 暗証番号を登録しました。次回から同じ番号でログインしてください。');
   }
@@ -1151,6 +1176,15 @@ function updateHomeStats() {
     konpo: todayStats.konpo,
     updatedAt: new Date().toISOString(),
   }));
+
+  // DB統計（あれば上書き）
+  if (dbItems.length > 0) {
+    const todayDB = dbItems.filter(i => i.judged_at && i.judged_at.startsWith(today));
+    const bunkaCount = todayDB.filter(i => i.status !== '受取済み').length;
+    document.getElementById('statBunka').textContent = bunkaCount;
+    const shuppinCount = dbItems.filter(i => i.listed_at && i.listed_at.startsWith(today)).length;
+    document.getElementById('statShuppin').textContent = shuppinCount;
+  }
 
   // ボトルネック計算
   updateBottleneck(items);
@@ -2989,6 +3023,10 @@ function deleteItem(mgmtNum) {
     deletedBy: currentUser.name,
     timestamp: formatTimestamp(),
   });
+  // Supabase DBからも削除
+  if (fegDb) {
+    fegDb.from('tkb_items').delete().eq('mgmt_num', mgmtNum);
+  }
   closeItemDetail();
   renderStockList();
   updateHomeStats();
@@ -3163,6 +3201,11 @@ async function completeShipping() {
     tracking_number: tracking,
     staff_id: currentUser.name,
     timestamp: formatTimestamp(),
+  });
+
+  // Supabase DBも更新
+  updateItemStatus(selectedItem.mgmtNum, '発送済み', {
+    shipped_at: new Date().toISOString(),
   });
 
   showToast('🚚 ' + selectedItem.mgmtNum + ' 出荷完了');
