@@ -654,35 +654,35 @@
         <div id="photoMode" style="display:none">
           <div class="camera-guide">
             <h3>📷 商品の写真を撮影</h3>
-            <p class="photo-tip"><strong>カッティングボード（方眼）の上に商品を置いて</strong>撮影。<br>品番があれば1枚でOK。古道具・ビンテージは追加写真で判定精度UP。</p>
+            <p class="photo-tip"><strong>カッティングボード（方眼）の上に商品を置いて</strong>撮影。<br>1枚でAI判定できます。精度を上げたい場合は追加撮影してください。</p>
           </div>
           <!-- 写真プレビューグリッド -->
           <div class="photo-grid" id="photoGrid">
-            <div class="photo-slot" id="photoSlot1" onclick="takeMultiPhoto(1)">
-              <span class="photo-slot-label">1</span>
-              <span class="photo-slot-hint">全体+基準物</span>
+            <div class="photo-slot photo-slot-main" id="photoSlot1" onclick="takeMultiPhoto(1)">
+              <span class="photo-slot-label">📷</span>
+              <span class="photo-slot-hint">タップして撮影</span>
               <img id="multiPreview1" class="photo-slot-img" style="display:none">
               <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(1)" style="display:none">✕</button>
             </div>
-            <div class="photo-slot" id="photoSlot2" onclick="takeMultiPhoto(2)">
+            <div class="photo-slot" id="photoSlot2" onclick="takeMultiPhoto(2)" style="display:none">
               <span class="photo-slot-label">2</span>
               <span class="photo-slot-hint">型番ラベル</span>
               <img id="multiPreview2" class="photo-slot-img" style="display:none">
               <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(2)" style="display:none">✕</button>
             </div>
-            <div class="photo-slot" id="photoSlot3" onclick="takeMultiPhoto(3)">
+            <div class="photo-slot" id="photoSlot3" onclick="takeMultiPhoto(3)" style="display:none">
               <span class="photo-slot-label">3</span>
               <span class="photo-slot-hint">裏面・底面</span>
               <img id="multiPreview3" class="photo-slot-img" style="display:none">
               <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(3)" style="display:none">✕</button>
             </div>
-            <div class="photo-slot" id="photoSlot4" onclick="takeMultiPhoto(4)">
+            <div class="photo-slot" id="photoSlot4" onclick="takeMultiPhoto(4)" style="display:none">
               <span class="photo-slot-label">4</span>
               <span class="photo-slot-hint">傷・汚れ</span>
               <img id="multiPreview4" class="photo-slot-img" style="display:none">
               <button class="photo-slot-remove" onclick="event.stopPropagation(); removeMultiPhoto(4)" style="display:none">✕</button>
             </div>
-            <div class="photo-slot" id="photoSlot5" onclick="takeMultiPhoto(5)">
+            <div class="photo-slot" id="photoSlot5" onclick="takeMultiPhoto(5)" style="display:none">
               <span class="photo-slot-label">5</span>
               <span class="photo-slot-hint">付属品等</span>
               <img id="multiPreview5" class="photo-slot-img" style="display:none">
@@ -690,9 +690,10 @@
             </div>
           </div>
           <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handleMultiPhoto(event)">
-          <p id="photoCount" class="photo-count-msg">まず1枚目を撮影してください</p>
+          <p id="photoCount" class="photo-count-msg">まず1枚撮影してください</p>
           <div id="afterPhotos" style="display:none">
             <button class="btn btn-primary" onclick="analyzePhoto()">🤖 AIに判定させる（<span id="photoCountNum">1</span>枚）</button>
+            <button class="btn btn-outline" onclick="showMorePhotoSlots()" id="addMorePhotosBtn" style="margin-top:8px; font-size:13px;">📷 写真を追加（判定精度UP）</button>
           </div>
         </div>
 
@@ -821,22 +822,9 @@
           <!-- 実測採寸（全商品共通） -->
           <h3 class="section-title">📏 実測採寸</h3>
           <p style="font-size:12px; color:var(--sub); margin-bottom:8px;">AI判定: <span id="aiSizeDisplay">—</span></p>
-          <div class="size-input-grid">
-            <div class="size-input-item">
-              <label>縦 (cm)</label>
-              <input type="number" id="sizeHeight" class="search-input" placeholder="縦" inputmode="numeric">
-            </div>
-            <div class="size-input-item">
-              <label>横 (cm)</label>
-              <input type="number" id="sizeWidth" class="search-input" placeholder="横" inputmode="numeric">
-            </div>
-            <div class="size-input-item">
-              <label>高さ (cm)</label>
-              <input type="number" id="sizeDepth" class="search-input" placeholder="高さ" inputmode="numeric">
-            </div>
-          </div>
-          <div class="form-group" style="margin-top:8px;">
-            <input type="text" id="sizeNote" class="search-input" placeholder="サイズ備考（自由入力）" style="width:100%">
+          <div class="form-group">
+            <input type="text" id="sizeInput" class="search-input" placeholder="例: 40×40×40 / 40 40 40 / フリー入力OK" style="width:100%; font-size:16px;">
+            <p style="font-size:11px; color:var(--sub); margin-top:4px;">※ 縦×横×高さ、スペース区切り、全角半角どちらでもOK</p>
           </div>
 
           <h3 class="section-title" style="margin-top:20px;">📍 保管場所を選択</h3>

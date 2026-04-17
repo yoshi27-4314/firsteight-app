@@ -1285,6 +1285,9 @@ body[data-theme="female"] {
   height: 1px; background: #2A3553; margin: 4px 16px;
 }
 
+/* ====== 1枚目大きく ====== */
+.photo-slot-main { grid-column: 1 / -1; aspect-ratio: 4/3; }
+
 /* ====== 採寸入力 ====== */
 .size-input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .size-input-item label { font-size: 11px; color: var(--sub); display: block; margin-bottom: 2px; }

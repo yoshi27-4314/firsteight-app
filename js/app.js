@@ -1745,16 +1745,30 @@ function updatePhotoCountUI() {
   const countNum = document.getElementById('photoCountNum');
 
   if (count === 0) {
-    countMsg.textContent = 'まず1枚目を撮影してください';
+    countMsg.textContent = 'まず1枚撮影してください';
     afterBtn.style.display = 'none';
   } else {
-    const tips = [];
-    if (count === 1) tips.push('型番ラベルや裏面の写真を追加すると判定精度が上がります');
-    if (count >= 2) tips.push('判定に十分な情報があります');
-    countMsg.textContent = `${count}枚撮影済み` + (tips.length ? ` — ${tips[0]}` : '');
+    countMsg.textContent = `${count}枚撮影済み`;
     afterBtn.style.display = '';
     countNum.textContent = count;
+    // 追加ボタンの表示制御
+    const addBtn = document.getElementById('addMorePhotosBtn');
+    if (addBtn) addBtn.style.display = count >= 5 ? 'none' : '';
   }
+}
+
+function showMorePhotoSlots() {
+  // 2〜5枚目のスロットを表示
+  for (let i = 2; i <= 5; i++) {
+    const slot = document.getElementById('photoSlot' + i);
+    if (slot) slot.style.display = '';
+  }
+  // 1枚目を通常サイズに戻す
+  const slot1 = document.getElementById('photoSlot1');
+  if (slot1) slot1.classList.remove('photo-slot-main');
+  // ボタンを隠す
+  const addBtn = document.getElementById('addMorePhotosBtn');
+  if (addBtn) addBtn.style.display = 'none';
 }
 
 function resetMultiPhotos() {
@@ -1763,8 +1777,16 @@ function resetMultiPhotos() {
     const preview = document.getElementById('multiPreview' + i);
     if (preview) { preview.style.display = 'none'; preview.src = ''; }
     const slot = document.getElementById('photoSlot' + i);
-    if (slot) { slot.classList.remove('has-photo'); slot.querySelector('.photo-slot-remove').style.display = 'none'; }
+    if (slot) {
+      slot.classList.remove('has-photo');
+      slot.querySelector('.photo-slot-remove').style.display = 'none';
+      // 2〜5枚目を非表示に戻す
+      if (i >= 2) slot.style.display = 'none';
+    }
   }
+  // 1枚目を大きく戻す
+  const slot1 = document.getElementById('photoSlot1');
+  if (slot1) slot1.classList.add('photo-slot-main');
   updatePhotoCountUI();
 }
 
@@ -2338,10 +2360,8 @@ function goToStep4() {
   const aiSizeEl = document.getElementById('aiSizeDisplay');
   if (aiSizeEl) aiSizeEl.textContent = currentItem.estimatedSize || '判定なし';
   // 採寸入力をリセット
-  ['sizeHeight', 'sizeWidth', 'sizeDepth', 'sizeNote'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
+  const sizeInput = document.getElementById('sizeInput');
+  if (sizeInput) sizeInput.value = '';
   showCameraStep(4);
 }
 
@@ -2396,27 +2416,32 @@ function buildLocationString(custom) {
   return parts.join(' / ');
 }
 
+// サイズ入力を正規化（全角→半角、スペース/×/*区切りを統一）
+function normalizeSize(input) {
+  // 全角→半角
+  let s = input.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  // 全角スペース→半角
+  s = s.replace(/　/g, ' ');
+  // ×, x, X, *, スペースを統一区切りに
+  s = s.replace(/[×xX\*]/g, ' ');
+  // 数値をパース
+  const nums = s.match(/[\d.]+/g);
+  if (nums && nums.length >= 2) {
+    return nums.join('×') + 'cm';
+  }
+  // パースできなければそのまま返す
+  return input;
+}
+
 function confirmLocation() {
   const custom = document.getElementById('locationCustom').value.trim();
   const loc = buildLocationString(custom);
   if (!loc) { showToast('保管場所を選択してください'); return; }
 
   // 実測サイズを保存
-  const h = document.getElementById('sizeHeight')?.value || '';
-  const w = document.getElementById('sizeWidth')?.value || '';
-  const d = document.getElementById('sizeDepth')?.value || '';
-  const note = document.getElementById('sizeNote')?.value || '';
-  if (h || w || d) {
-    currentItem.measuredSize = `${h}×${w}×${d}cm`;
-    currentItem.sizeHeight = h;
-    currentItem.sizeWidth = w;
-    currentItem.sizeDepth = d;
-  }
-  if (note) {
-    currentItem.measuredSize = (currentItem.measuredSize || '') + ' ' + note;
-  }
-  // 実測があればAI判定サイズを上書き
-  if (currentItem.measuredSize) {
+  const rawSize = (document.getElementById('sizeInput')?.value || '').trim();
+  if (rawSize) {
+    currentItem.measuredSize = normalizeSize(rawSize);
     currentItem.estimatedSize = currentItem.measuredSize;
   }
 
