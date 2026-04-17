@@ -4667,7 +4667,28 @@ function renderTorihikiResults(items) {
   window._torihikiItems = items;
 }
 
-function confirmTorihikiUpdate(data, idx) {
+// ステータスの正しい順序（数字が大きい方が進んでいる）
+const STATUS_ORDER = {
+  '分荷確定': 1, '撮影待ち': 2, '出品待ち': 3, '出品': 3, '出品中': 4, '出品作業中': 4,
+  '落札済み': 5, '入金待ち': 6, '入金確認済み': 7, '梱包作業': 8, '梱包待ち': 8,
+  '発送済み': 9, '出荷済': 9, '出荷済み': 9, '完了': 10,
+};
+
+async function confirmTorihikiUpdate(data, idx) {
+  // 巻き戻りチェック
+  if (data.mgmtNum && fegDb) {
+    const { data: dbItem } = await fegDb.from('tkb_items').select('status').eq('mgmt_num', data.mgmtNum).single();
+    if (dbItem && dbItem.status) {
+      const currentOrder = STATUS_ORDER[dbItem.status] || 0;
+      const newOrder = STATUS_ORDER[data.status] || 0;
+      if (newOrder < currentOrder) {
+        if (!confirm(`⚠️ 現在「${dbItem.status}」→「${data.status}」に戻りますが、よろしいですか？`)) {
+          return;
+        }
+      }
+    }
+  }
+
   const payload = {
     action: 'status_update',
     mgmtNum: data.mgmtNum || '',
@@ -4714,6 +4735,52 @@ function confirmAllTorihiki() {
     }
   });
   showToast(`📋 ${items.length}件をまとめて更新しました`);
+}
+
+// ステータス確認
+async function checkItemStatus() {
+  const q = document.getElementById('statusCheckInput')?.value?.trim();
+  if (!q) { showToast('管理番号またはキーワードを入力してください'); return; }
+
+  const resultEl = document.getElementById('statusCheckResult');
+  if (!resultEl) return;
+
+  if (!fegDb) { resultEl.innerHTML = '<p style="color:var(--danger);">DB未接続</p>'; return; }
+
+  // DB検索
+  const { data, error } = await fegDb.from('tkb_items')
+    .select('*')
+    .or(`mgmt_num.ilike.%${q}%,product_name.ilike.%${q}%`)
+    .order('judged_at', { ascending: false })
+    .limit(20);
+
+  if (error || !data || data.length === 0) {
+    resultEl.innerHTML = `<p style="color:var(--sub); font-size:13px;">「${escapeHtml(q)}」は見つかりませんでした</p>`;
+    return;
+  }
+
+  const statusColors = {
+    '分荷確定': '#006B3F', '撮影待ち': '#006B3F', '出品待ち': '#C5A258', '出品': '#C5A258',
+    '出品中': '#007AFF', '出品作業中': '#007AFF', '落札済み': '#FF9500', '入金待ち': '#FF3B30',
+    '入金確認済み': '#4CD964', '梱包作業': '#007AFF', '発送済み': '#4CD964', '出荷済': '#8E8E93', '完了': '#8E8E93',
+  };
+
+  resultEl.innerHTML = data.map(i => {
+    const color = statusColors[i.status] || '#8E8E93';
+    const days = i.judged_at ? Math.floor((new Date() - new Date(i.judged_at)) / (1000*60*60*24)) : '?';
+    return `
+      <div style="background:var(--card); border-radius:10px; padding:12px; margin-bottom:6px; border-left:4px solid ${color};">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-weight:600; font-size:13px; color:var(--text);">${escapeHtml(i.mgmt_num || '—')}</span>
+          <span style="background:${color}22; color:${color}; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:700;">${escapeHtml(i.status || '不明')}</span>
+        </div>
+        <div style="font-size:13px; color:var(--text); margin-top:4px;">${escapeHtml(i.product_name || '—')}</div>
+        <div style="font-size:11px; color:var(--sub); margin-top:2px;">
+          ${escapeHtml(i.channel || '')} ｜ ¥${(i.estimated_price_max || 0).toLocaleString()} ｜ ${escapeHtml(i.location || '')} ｜ ${days}日経過 ｜ ${escapeHtml(i.staff_name || '')}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function resetTorihiki() {
