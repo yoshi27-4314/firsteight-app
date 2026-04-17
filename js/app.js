@@ -1670,7 +1670,22 @@ function showCameraStep(step) {
   cameraStep = step;
   // 作業中データを保持
   saveWorkingSession();
+  // ブラウザ履歴にステップを記録（戻るボタン対応）
+  history.pushState({ cameraStep: step, tab: currentTab }, '', '');
 }
+
+// ブラウザの戻るボタンでアプリ内のステップを戻す
+window.addEventListener('popstate', function(e) {
+  if (e.state && e.state.cameraStep !== undefined) {
+    const step = e.state.cameraStep;
+    document.querySelectorAll('.camera-step').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('cameraStep' + step);
+    if (el) el.classList.add('active');
+    cameraStep = step;
+  } else if (e.state && e.state.tab) {
+    switchTab(e.state.tab);
+  }
+});
 
 // ====== 複数写真撮影 ======
 let currentPhotoSlot = 0;
