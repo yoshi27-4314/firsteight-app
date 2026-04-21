@@ -1754,6 +1754,7 @@ async function analyzeBarcode() {
       headers: {
         'Content-Type': 'application/json',
         'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
         image: null,
@@ -1922,22 +1923,30 @@ function takeMultiPhoto(slot) {
 function handleMultiPhoto(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const slot = currentPhotoSlot;
+  // currentPhotoSlotを使うが、既に写真があるスロットなら上書き
+  // スロットが未指定や範囲外の場合は最初の空きスロットに入れる
+  let slot = currentPhotoSlot;
+  if (!slot || slot < 1 || slot > 5) {
+    slot = multiPhotos.findIndex(p => p === null) + 1;
+    if (slot === 0) slot = 1; // 全部埋まっていれば1枚目を上書き
+  }
+  const capturedSlot = slot; // クロージャで固定
 
   const reader = new FileReader();
   reader.onload = function(e) {
     compressImage(e.target.result, 1200, 0.8, (compressed) => {
-      multiPhotos[slot - 1] = compressed;
+      multiPhotos[capturedSlot - 1] = compressed;
       // プレビュー表示
-      const preview = document.getElementById('multiPreview' + slot);
-      preview.src = compressed;
-      preview.style.display = 'block';
-      const slotEl = document.getElementById('photoSlot' + slot);
-      slotEl.classList.add('has-photo');
-      // 削除ボタン表示
-      slotEl.querySelector('.photo-slot-remove').style.display = '';
+      const preview = document.getElementById('multiPreview' + capturedSlot);
+      if (preview) { preview.src = compressed; preview.style.display = 'block'; }
+      const slotEl = document.getElementById('photoSlot' + capturedSlot);
+      if (slotEl) {
+        slotEl.classList.add('has-photo');
+        const removeBtn = slotEl.querySelector('.photo-slot-remove');
+        if (removeBtn) removeBtn.style.display = '';
+      }
       // 1枚目をphoto1にも保持（互換性）
-      if (slot === 1) currentItem.photo1 = compressed;
+      if (capturedSlot === 1) currentItem.photo1 = compressed;
       updatePhotoCountUI();
     });
   };
@@ -2054,6 +2063,7 @@ async function analyzePhoto() {
       headers: {
         'Content-Type': 'application/json',
         'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
         image: photos[0],
@@ -2468,6 +2478,7 @@ async function requestRejudge() {
       headers: {
         'Content-Type': 'application/json',
         'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
         image: photos[0],
@@ -2949,6 +2960,7 @@ async function uploadToDrive(mgmtNum) {
       headers: {
         'Content-Type': 'application/json',
         'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
         managementNumber: mgmtNum,
@@ -3016,6 +3028,7 @@ async function chatWithAI(msg) {
       headers: {
         'Content-Type': 'application/json',
         'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
         image: null,
@@ -3211,6 +3224,7 @@ async function uploadAddedPhotos() {
       headers: {
         'Content-Type': 'application/json',
         'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
         managementNumber: mgmtNum,
@@ -3255,6 +3269,7 @@ async function handleTrackingPhoto(event) {
           headers: {
             'Content-Type': 'application/json',
             'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
           },
           body: JSON.stringify({
             image: compressed,
@@ -4056,6 +4071,7 @@ async function handleReceiptPhoto(event) {
           headers: {
             'Content-Type': 'application/json',
             'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
           },
           body: JSON.stringify({
             image: compressed,
@@ -4811,6 +4827,7 @@ async function handleSalesPhoto(event) {
         headers: {
           'Content-Type': 'application/json',
           'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
           image: dataUrl,
@@ -4908,6 +4925,7 @@ async function handleTorihikiPhoto(event) {
         headers: {
           'Content-Type': 'application/json',
           'apikey': CONFIG.SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
           image: dataUrl,
