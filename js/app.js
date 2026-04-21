@@ -1082,6 +1082,8 @@ function showMainScreen() {
   loadTheme();
   loadContactInfo();
   initMiniClocks();
+  // 失敗したアップロードがないかチェック
+  checkFailedUploads();
   renderFeatureGuide();
   renderChangelog();
   renderLeaveHistory();
@@ -2429,19 +2431,36 @@ function updateMgmtNumBanners() {
 // GASから管理番号を取得（委託元ごとにプレフィックス付き）
 async function requestMgmtNumFromGAS() {
   const url = IS_TEST_MODE ? CONFIG.GAS_URL_TEST : CONFIG.GAS_URL;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'generate_mgmt_num',
-      category: currentCategory || 'jisha',
-    }),
-  });
-  const result = await response.json();
-  if (result.ok && result.mgmtNum) {
-    return result.mgmtNum;
+  const maxRetries = 3;
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_mgmt_num',
+          category: currentCategory || 'jisha',
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      const result = await response.json();
+      if (result.ok && result.mgmtNum) {
+        return result.mgmtNum;
+      }
+      lastError = new Error('GAS応答にmgmtNumなし');
+    } catch (err) {
+      lastError = err;
+      console.warn(`GAS採番 試行${attempt}/${maxRetries} 失敗:`, err.message);
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 2000 * attempt));
+      }
+    }
   }
-  throw new Error('GAS採番失敗');
+  throw lastError || new Error('GAS採番失敗（3回リトライ後）');
 }
 
 // AI判定結果の手動編集（編集内容はAI再判定で上書きされない）
@@ -2858,14 +2877,17 @@ async function completeRegistration(loc) {
   // Supabase DBのステータスを出品待ちに更新
   updateItemStatus(mgmtNum, '出品待ち', { location: loc });
 
-  // Google Driveに写真アップロード（バックグラウンド）
+  // Google Driveに写真アップロード（バックグラウンド・リトライ付き）
   uploadToDrive(mgmtNum).then(result => {
     if (result && result.folderUrl) {
       currentItem.driveFolderUrl = result.folderUrl;
-      console.log('Drive保存完了:', result.folderUrl);
+      showToast('✅ 写真をGoogle Driveに保存しました');
+    } else if (result === null) {
+      // uploadToDrive内で失敗キューに保存済み・トースト表示済み
     }
   }).catch(err => {
     console.error('Driveアップロードエラー:', err);
+    showToast('⚠️ 写真の保存に失敗しました（' + mgmtNum + '）');
   });
 
   // GASに送信（バックグラウンド）
@@ -2944,24 +2966,73 @@ async function uploadToDrive(mgmtNum) {
 
   if (images.length === 0) return null;
 
-  try {
-    const response = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-drive', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': CONFIG.SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
-      },
-      body: JSON.stringify({
-        managementNumber: mgmtNum,
-        images: images,
-      }),
-    });
-    return await response.json();
-  } catch (err) {
-    console.error('Drive upload error:', err);
-    return null;
+  const maxRetries = 3;
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+      const response = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/takeback-drive', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': CONFIG.SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          managementNumber: mgmtNum,
+          images: images,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!response.ok) {
+        throw new Error(`Drive API エラー: ${response.status}`);
+      }
+      const result = await response.json();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result;
+    } catch (err) {
+      lastError = err;
+      console.warn(`Drive保存 試行${attempt}/${maxRetries} 失敗:`, err.message);
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 3000 * attempt));
+      }
+    }
   }
+  // 3回失敗 → 失敗キューに保存してスタッフに通知
+  console.error('Drive保存 完全失敗:', mgmtNum, lastError);
+  saveFailedUpload(mgmtNum, images);
+  showToast('⚠️ 写真の保存に失敗しました（' + mgmtNum + '）。後で自動リトライします。');
+  return null;
+}
+
+// 失敗したアップロードをローカルに保存（後でリトライ用）
+function saveFailedUpload(mgmtNum, images) {
+  try {
+    const queue = JSON.parse(localStorage.getItem('f8_failed_uploads') || '[]');
+    queue.push({
+      mgmtNum: mgmtNum,
+      imageCount: images.length,
+      failedAt: new Date().toISOString(),
+      retryCount: 0,
+    });
+    localStorage.setItem('f8_failed_uploads', JSON.stringify(queue));
+  } catch (e) {
+    console.error('失敗キュー保存エラー:', e);
+  }
+}
+
+// 失敗キューの件数を確認して警告表示
+function checkFailedUploads() {
+  try {
+    const queue = JSON.parse(localStorage.getItem('f8_failed_uploads') || '[]');
+    if (queue.length > 0) {
+      showToast('⚠️ 写真保存に失敗した商品が ' + queue.length + ' 件あります。管理者に連絡してください。');
+    }
+  } catch (e) {}
 }
 
 // ====== GAS連携 ======
@@ -2971,17 +3042,53 @@ async function sendToGAS(payload) {
     payload._test = true;
     console.log('[テストモード] GAS送信:', JSON.stringify(payload).slice(0, 200));
   }
+  const maxRetries = 2;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'no-cors',
+      });
+      clearTimeout(timeout);
+      // no-corsでは応答を読めないが、fetchが成功すればリクエストは届いている
+      // 失敗キューにもバックアップを保存
+      saveGASBackup(payload);
+      return true;
+    } catch (err) {
+      console.warn(`GAS送信 試行${attempt}/${maxRetries} 失敗:`, err.message);
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+  }
+  // 完全失敗 → ローカルにバックアップ保存
+  console.error('GAS送信 完全失敗:', JSON.stringify(payload).slice(0, 200));
+  saveGASBackup(payload, true);
+  return false;
+}
+
+// GAS送信データのバックアップ（万が一の消失防止）
+function saveGASBackup(payload, failed) {
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      mode: 'no-cors',
+    const key = failed ? 'f8_gas_failed' : 'f8_gas_sent';
+    const queue = JSON.parse(localStorage.getItem(key) || '[]');
+    queue.push({
+      payload: payload,
+      timestamp: new Date().toISOString(),
     });
-    return true;
-  } catch (err) {
-    console.error('GAS送信エラー:', err);
-    return false;
+    // 最大100件保持（古いものから削除）
+    while (queue.length > 100) queue.shift();
+    localStorage.setItem(key, JSON.stringify(queue));
+  } catch (e) {
+    // localStorage容量超過時は古いバックアップを削除
+    try {
+      localStorage.removeItem('f8_gas_sent');
+      localStorage.setItem('f8_gas_failed', JSON.stringify([{ payload, timestamp: new Date().toISOString() }]));
+    } catch (e2) {}
   }
 }
 
