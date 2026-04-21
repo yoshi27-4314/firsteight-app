@@ -2079,6 +2079,17 @@ async function analyzePhoto() {
         ? `¥${j.estimatedPrice.min?.toLocaleString()}〜¥${j.estimatedPrice.max?.toLocaleString()}`
         : '—';
       document.getElementById('aiSize').textContent = j.estimatedSize || '—';
+      // 出品タイトル・説明文の表示
+      const ltRow = document.getElementById('aiListingTitleRow');
+      const ldRow = document.getElementById('aiListingDescRow');
+      if (j.listingTitle) {
+        document.getElementById('aiListingTitle').textContent = j.listingTitle;
+        if (ltRow) ltRow.style.display = '';
+      }
+      if (j.listingDescription) {
+        document.getElementById('aiListingDesc').textContent = j.listingDescription;
+        if (ldRow) ldRow.style.display = '';
+      }
       // 種別に応じてチャンネル表示を上書き
       if (currentCategory === 'bigsports') {
         document.getElementById('aiChannel').textContent = 'ビッグスポーツ';
@@ -2329,6 +2340,8 @@ async function finalizeAcceptJudgment() {
       start_price: String(currentItem.startPrice || ''),
       score: String(currentItem.score || ''),
       estimated_size: currentItem.estimatedSize || '',
+      listing_title: currentItem.listingTitle || '',
+      listing_description: currentItem.listingDescription || '',
       staff_id: currentUser.name,
       needs_approval: currentItem.needsApproval ? 'はい' : 'いいえ',
       approval_reason: currentItem.approvalReason || '',
@@ -2354,6 +2367,8 @@ async function finalizeAcceptJudgment() {
       needsApproval: currentItem.needsApproval,
       approvalReason: currentItem.approvalReason,
       score: currentItem.score,
+      listingTitle: currentItem.listingTitle,
+      listingDescription: currentItem.listingDescription,
       staffName: currentUser.name,
       status: '撮影待ち',
     });
@@ -2477,6 +2492,17 @@ async function requestRejudge() {
         ? `¥${j.estimatedPrice.min?.toLocaleString()}〜¥${j.estimatedPrice.max?.toLocaleString()}`
         : '—';
       document.getElementById('aiSize').textContent = j.estimatedSize || '—';
+      // 再判定時も出品タイトル・説明文を更新
+      const ltRow2 = document.getElementById('aiListingTitleRow');
+      const ldRow2 = document.getElementById('aiListingDescRow');
+      if (j.listingTitle) {
+        document.getElementById('aiListingTitle').textContent = j.listingTitle;
+        if (ltRow2) ltRow2.style.display = '';
+      }
+      if (j.listingDescription) {
+        document.getElementById('aiListingDesc').textContent = j.listingDescription;
+        if (ldRow2) ldRow2.style.display = '';
+      }
       if (currentCategory === 'bigsports') {
         document.getElementById('aiChannel').textContent = 'ビッグスポーツ';
         currentItem.channel = 'ビッグスポーツ';
@@ -2770,9 +2796,10 @@ async function completeRegistration(loc) {
   document.getElementById('completeLocation').textContent = loc;
   showCameraStep(5);
 
-  // 出品情報の表示（通販チャンネル=1〜5の場合）
+  // 出品情報の表示（通販チャンネル: type=tsuhan の場合）
   const listingSection = document.getElementById('listingSection');
-  if (currentItem.channelNumber && currentItem.channelNumber <= 5) {
+  const channelInfo = CONFIG.CHANNELS.find(c => c.id === currentItem.channelNumber);
+  if (channelInfo && channelInfo.type === 'tsuhan') {
     listingSection.style.display = 'block';
     document.getElementById('listingTitle').value = currentItem.listingTitle || currentItem.productName || '';
     document.getElementById('listingDesc').value = currentItem.listingDescription || '';

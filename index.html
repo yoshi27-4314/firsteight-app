@@ -788,6 +788,14 @@
               <span class="ai-label">推定サイズ</span>
               <span class="ai-value" id="aiSize">—</span>
             </div>
+            <div class="ai-row" id="aiListingTitleRow" style="display:none;">
+              <span class="ai-label">出品タイトル</span>
+              <span class="ai-value ai-editable" id="aiListingTitle" onclick="editAiField('listingTitle', 'aiListingTitle', '出品タイトル')" style="font-size:12px;">—</span>
+            </div>
+            <div class="ai-row" id="aiListingDescRow" style="display:none;">
+              <span class="ai-label">商品説明</span>
+              <span class="ai-value ai-editable" id="aiListingDesc" onclick="editAiField('listingDescription', 'aiListingDesc', '商品説明')" style="font-size:11px; white-space:pre-wrap; max-height:80px; overflow-y:auto;">—</span>
+            </div>
           </div>
           <!-- 単品/まとめ選択 -->
           <div id="bundleSelect" style="margin-top:12px">
@@ -1327,7 +1335,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=20260421a"></script>
-<script src="js/app.js?v=20260421a"></script>
+<script src="js/config.js?v=20260421b"></script>
+<script src="js/app.js?v=20260421b"></script>
 </body>
 </html>
