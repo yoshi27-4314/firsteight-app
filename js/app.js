@@ -1931,9 +1931,96 @@ function takePhoto() {
 }
 
 function takeMultiPhoto(slot) {
+  // 既に写真がある場合はプレビュー表示
+  if (multiPhotos[slot - 1]) {
+    openPhotoPreview(slot);
+    return;
+  }
   currentPhotoSlot = slot;
   document.getElementById('photoInput').click();
 }
+
+// ====== 写真プレビュー（拡大表示 + 修正メニュー） ======
+function openPhotoPreview(slot) {
+  const photo = multiPhotos[slot - 1];
+  if (!photo) return;
+
+  let overlay = document.getElementById('photoPreviewOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'photoPreviewOverlay';
+    overlay.className = 'modal-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  overlay.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:95vw; max-height:95vh; padding:0; overflow:hidden;">
+      <div class="modal-header" style="padding:12px 16px;">
+        <h3 style="color:var(--text); font-size:14px;">${slot}枚目 プレビュー</h3>
+        <button class="modal-close" onclick="closePhotoPreview()">✕</button>
+      </div>
+      <div style="text-align:center; background:#000; max-height:60vh; overflow:hidden;">
+        <img src="${photo}" style="max-width:100%; max-height:60vh; object-fit:contain;">
+      </div>
+      <div style="padding:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="retakePreviewPhoto(${slot})" style="flex:1; font-size:13px;">📷 撮り直す</button>
+        <button class="btn btn-outline" onclick="rotatePreviewPhoto(${slot})" style="flex:1; font-size:13px;">🔄 回転</button>
+        <button class="btn btn-outline" onclick="cropPreviewPhoto(${slot})" style="flex:1; font-size:13px;">✂️ トリミング</button>
+        <button class="btn btn-outline" onclick="removeMultiPhoto(${slot}); closePhotoPreview();" style="font-size:13px; color:var(--danger); border-color:var(--danger);">🗑️</button>
+      </div>
+    </div>
+  `;
+  overlay.onclick = (e) => { if (e.target === overlay) closePhotoPreview(); };
+  overlay.classList.add('open');
+}
+
+function closePhotoPreview() {
+  const overlay = document.getElementById('photoPreviewOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function retakePreviewPhoto(slot) {
+  closePhotoPreview();
+  currentPhotoSlot = slot;
+  document.getElementById('photoInput').click();
+}
+
+function rotatePreviewPhoto(slot) {
+  const photo = multiPhotos[slot - 1];
+  if (!photo) return;
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.height;
+    canvas.height = img.width;
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(90 * Math.PI / 180);
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+    const rotated = canvas.toDataURL('image/jpeg', 0.85);
+    multiPhotos[slot - 1] = rotated;
+    if (slot === 1) currentItem.photo1 = rotated;
+    // プレビュー更新
+    const preview = document.getElementById('multiPreview' + slot);
+    if (preview) preview.src = rotated;
+    // プレビューモーダルも更新
+    openPhotoPreview(slot);
+    showToast('🔄 回転しました');
+  };
+  img.src = photo;
+}
+
+function cropPreviewPhoto(slot) {
+  const photo = multiPhotos[slot - 1];
+  if (!photo) return;
+  closePhotoPreview();
+  // 既存のトリミングモーダルを再利用
+  _cropMode = 'product';
+  _cropProductSlot = slot;
+  openCropModal(photo, 'product');
+}
+
+let _cropProductSlot = 0;
 
 function handleMultiPhoto(event) {
   const file = event.target.files[0];
@@ -4629,6 +4716,10 @@ function openCropModal(dataUrl, mode) {
     } else {
       container.classList.remove('square');
     }
+    // 商品写真は正方形トリミング（ヤフオク画像は正方形が基本）
+    if (mode === 'product') {
+      container.classList.remove('square');
+    }
 
     document.getElementById('cropImage').src = dataUrl;
     document.getElementById('cropOverlay').classList.add('open');
@@ -4676,7 +4767,9 @@ function applyCrop() {
   const ch = container.offsetHeight;
   const canvas = document.createElement('canvas');
 
-  if (_cropMode === 'bg') {
+  if (_cropMode === 'product') {
+    canvas.width = 1200; canvas.height = 1200;
+  } else if (_cropMode === 'bg') {
     canvas.width = 600; canvas.height = 300;
   } else {
     canvas.width = 300; canvas.height = 300;
@@ -4695,7 +4788,17 @@ function applyCrop() {
 
   const result = canvas.toDataURL('image/jpeg', 0.85);
 
-  if (_cropMode === 'avatar') {
+  if (_cropMode === 'product') {
+    // 商品写真のトリミング
+    const slot = _cropProductSlot;
+    if (slot >= 1 && slot <= 5) {
+      multiPhotos[slot - 1] = result;
+      if (slot === 1) currentItem.photo1 = result;
+      const preview = document.getElementById('multiPreview' + slot);
+      if (preview) preview.src = result;
+      showToast('✂️ トリミングしました');
+    }
+  } else if (_cropMode === 'avatar') {
     document.getElementById('avatarImg').src = result;
     document.getElementById('avatarImg').style.display = 'block';
     document.getElementById('avatarEmoji').style.display = 'none';
